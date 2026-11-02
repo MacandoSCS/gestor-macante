@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MACANTE RACING | Gestión Financiera & Escudería</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Iconos FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Gráficas Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Fuentes -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:ital,wght@0,700;0,900;1,800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            macante: {
+              bg: '#090a0c',
+              card: '#121418',
+              border: '#22262e',
+              red: '#e60000',
+              redHover: '#ff1a1a',
+              carbon: '#181b20'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Orbitron', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      background-color: #090a0c;
+      background-image: radial-gradient(#1f242d 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: #f3f4f6;
+    }
+    /* Evita que las etiquetas de meses cubiertos colapsen en varias líneas */
+    .status-pill {
+      white-space: nowrap !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.025em;
+    }
+    /* Modo Solo Lectura */
+    body.readonly-mode .admin-only {
+      display: none !important;
+    }
+    /* Scrollbar personalizada */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #090a0c; }
+    ::-webkit-scrollbar-thumb { background: #262b35; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #e60000; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col lg:flex-row font-sans antialiased selection:bg-macante-red selection:text-white">
+
+  <!-- SIDEBAR LATERAL -->
+  <aside class="w-full lg:w-72 bg-macante-card border-b lg:border-b-0 lg:border-r border-macante-border flex flex-col justify-between shrink-0">
+    <div>
+      <!-- LOGO MACANTE RACING -->
+      <div class="p-6 border-b border-macante-border flex flex-col items-center text-center bg-black/60">
+        <svg viewBox="0 0 300 170" class="w-48 h-auto mb-1 drop-shadow-[0_0_12px_rgba(230,0,0,0.35)]">
+          <!-- Ala Roja Izquierda Superior -->
+          <polygon points="75,30 165,65 145,75" fill="#e60000" />
+          <!-- Ala Roja Izquierda Inferior -->
+          <polygon points="82,48 140,78 90,115 118,76" fill="#e60000" />
+          <!-- Arco Rojo Derecho -->
+          <path d="M 192,70 C 220,90 210,115 140,128 C 185,112 198,92 182,78 Z" fill="#e60000" />
+          <!-- Flecha Principal Blanca -->
+          <polygon points="98,108 228,38 175,118 178,82" fill="#ffffff" />
+          <!-- Texto MACANTE -->
+          <text x="150" y="148" text-anchor="middle" fill="#ffffff" font-family="Orbitron, sans-serif" font-weight="900" font-style="italic" font-size="27" letter-spacing="2">MACANTE</text>
+          <!-- Texto RACING -->
+          <text x="150" y="167" text-anchor="middle" fill="#e60000" font-family="Orbitron, sans-serif" font-weight="700" font-style="italic" font-size="16" letter-spacing="6">RACING</text>
+        </svg>
+        <span class="text-[11px] font-mono uppercase tracking-widest text-gray-400 mt-1">Telemetry & Finance Suite</span>
+      </div>
+
+      <!-- NAVEGACIÓN -->
+      <nav class="p-3 space-y-1">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition bg-macante-red text-white">
+          <i class="fa-solid fa-gauge-high w-5 text-center"></i> Resumen y Cajas
+        </button>
+        <button onclick="switchTab('usuarios')" id="nav-usuarios" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-300 hover:bg-white/5 transition">
+          <i class="fa-solid fa-users-gear w-5 text-center"></i> Usuarios y Cuotas
+        </button>
+        <button onclick="switchTab('facturas')" id="nav-facturas" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-300 hover:bg-white/5 transition">
+          <i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i> Facturas y Eventos
+        </button>
+        <button onclick="switchTab('inventario')" id="nav-inventario" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-300 hover:bg-white/5 transition">
+          <i class="fa-solid fa-screwdriver-wrench w-5 text-center"></i> Inventario de Taller
+        </button>
+        <button onclick="switchTab('patrocinios')" id="nav-patrocinios" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-300 hover:bg-white/5 transition">
+          <i class="fa-solid fa-handshake-simple w-5 text-center"></i> Patrocinadores
+        </button>
+        <button onclick="switchTab('estadisticas')" id="nav-estadisticas" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-300 hover:bg-white/5 transition">
+          <i class="fa-solid fa-chart-pie w-5 text-center"></i> Estadísticas Visuales
+        </button>
+        <button onclick="switchTab('auditoria')" id="nav-auditoria" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-300 hover:bg-white/5 transition">
+          <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i> Registro (Log)
+        </button>
+      </nav>
+    </div>
+
+    <!-- ESTADO DE CONEXIÓN FIREBASE -->
+    <div class="p-4 border-t border-macante-border bg-black/40 space-y-3">
+      <div class="flex items-center justify-between text-xs">
+        <span class="text-gray-400">Estado Nube:</span>
+        <span id="cloud-status" class="flex items-center gap-1.5 font-mono text-amber-400">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Conectando...
+        </span>
+      </div>
+      <div class="text-[11px] text-gray-500 font-mono truncate">
+        ID: gestor-macante-racing
+      </div>
+      <button onclick="exportBackupJSON()" class="w-full py-2 px-3 bg-macante-carbon hover:bg-gray-800 border border-macante-border rounded text-xs font-medium text-gray-300 flex items-center justify-center gap-2 transition">
+        <i class="fa-solid fa-download"></i> Copia de Seguridad (.JSON)
+      </button>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <!-- BARRA SUPERIOR -->
+    <header class="bg-macante-card border-b border-macante-border px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 id="page-title" class="font-display text-lg font-bold tracking-wider uppercase text-white">Centro de Control Financiero</h1>
+        <p class="text-xs text-gray-400">Sincronización en tiempo real para encargados de Macante Racing</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Quién opera (para el Log) -->
+        <div class="flex items-center gap-2 bg-macante-bg border border-macante-border rounded-lg px-3 py-1.5">
+          <i class="fa-solid fa-user-astronaut text-macante-red text-xs"></i>
+          <span class="text-xs text-gray-400">Operador:</span>
+          <select id="active-operator" onchange="changeOperator(this.value)" class="bg-transparent text-xs font-semibold text-white focus:outline-none">
+          </select>
+        </div>
+
+        <!-- Selector de Rol (Edición vs Solo Lectura) -->
+        <div class="flex items-center bg-macante-bg border border-macante-border rounded-lg p-1">
+          <button id="btn-mode-edit" onclick="setReadOnlyMode(false)" class="px-3 py-1 rounded text-xs font-semibold bg-macante-red text-white transition">
+            <i class="fa-solid fa-pen-to-square mr-1"></i> Encargado
+          </button>
+          <button id="btn-mode-read" onclick="setReadOnlyMode(true)" class="px-3 py-1 rounded text-xs font-semibold text-gray-400 hover:text-white transition">
+            <i class="fa-solid fa-eye mr-1"></i> Solo Lectura
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ALERTA NÚMEROS ROJOS -->
+    <div id="red-alert-banner" class="hidden bg-red-950/90 border-b border-red-600 px-6 py-3 flex items-center justify-between text-red-200">
+      <div class="flex items-center gap-3">
+        <i class="fa-solid fa-triangle-exclamation text-red-500 text-lg animate-bounce"></i>
+        <div class="text-xs sm:text-sm">
+          <strong class="font-bold uppercase tracking-wide">¡Alerta de Números Rojos!</strong>
+          <span id="red-alert-text" class="ml-1">El saldo libre disponible o una de las cajas se encuentra en negativo.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ÁREA DE SECCIONES -->
+    <main class="p-6 space-y-8 overflow-y-auto flex-1">
+
+      <!-- ==========================================
+           SECCIÓN 1: DASHBOARD, CAJAS Y RESERVAS
+           ========================================== -->
+      <section id="tab-dashboard" class="tab-content space-y-6">
+        <!-- Tarjetas KPI Principales -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div class="bg-macante-card border border-macante-border rounded-xl p-5">
+            <div class="flex justify-between items-start">
+              <span class="text-xs uppercase font-bold tracking-wider text-gray-400">Patrimonio Total Cajas</span>
+              <i class="fa-solid fa-vault text-gray-500"></i>
+            </div>
+            <div id="kpi-total-money" class="text-2xl font-mono font-bold text-white mt-2">0,00 €</div>
+            <p class="text-[11px] text-gray-400 mt-1">Suma de Banco, Bizum, Efectivo y Hucha</p>
+          </div>
+
+          <div class="bg-macante-card border border-macante-border rounded-xl p-5">
+            <div class="flex justify-between items-start">
+              <span class="text-xs uppercase font-bold tracking-wider text-emerald-400">Saldo Libre Real</span>
+              <i class="fa-solid fa-circle-check text-emerald-500"></i>
+            </div>
+            <div id="kpi-free-money" class="text-2xl font-mono font-bold text-emerald-400 mt-2">0,00 €</div>
+            <p class="text-[11px] text-gray-400 mt-1">Dinero disponible descontando reservas</p>
+          </div>
+
+          <div class="bg-macante-card border border-macante-border rounded-xl p-5">
+            <div class="flex justify-between items-start">
+              <span class="text-xs uppercase font-bold tracking-wider text-amber-400">Fondos Bloqueados</span>
+              <i class="fa-solid fa-lock text-amber-500"></i>
+            </div>
+            <div id="kpi-locked-money" class="text-2xl font-mono font-bold text-amber-400 mt-2">0,00 €</div>
+            <p class="text-[11px] text-gray-400 mt-1">Apartado para eventos o reparaciones</p>
+          </div>
+
+          <div class="bg-macante-card border border-macante-border rounded-xl p-5">
+            <div class="flex justify-between items-start">
+              <span class="text-xs uppercase font-bold tracking-wider text-macante-red">Coste Fijo Mensual</span>
+              <i class="fa-solid fa-calendar-check text-macante-red"></i>
+            </div>
+            <div id="kpi-monthly-burn" class="text-2xl font-mono font-bold text-white mt-2">0,00 €/mes</div>
+            <p id="kpi-quota-summary" class="text-[11px] text-gray-400 mt-1">0,00 € por miembro al mes</p>
+          </div>
+        </div>
+
+        <!-- Dónde está el dinero (Cajas) -->
+        <div class="bg-macante-card border border-macante-border rounded-xl p-6">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-macante-border">
+            <div>
+              <h2 class="font-display text-base font-bold uppercase tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-wallet text-macante-red"></i> ¿Dónde está el dinero? (Ubicación por Cajas)
+              </h2>
+              <p class="text-xs text-gray-400 mt-0.5">Control exacto de cuánto dinero hay en cada cuenta o en efectivo físico.</p>
+            </div>
+            <button onclick="openBoxModal()" class="admin-only px-4 py-2 bg-macante-carbon hover:bg-gray-800 border border-macante-border rounded-lg text-xs font-semibold text-white transition flex items-center gap-2">
+              <i class="fa-solid fa-Sliders"></i> Ajustar / Transferir entre Cajas
+            </button>
+          </div>
+
+          <div id="boxes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
+          </div>
+        </div>
+
+        <!-- Presupuestos Previos y Fondos Bloqueados -->
+        <div class="bg-macante-card border border-macante-border rounded-xl p-6">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-macante-border">
+            <div>
+              <h2 class="font-display text-base font-bold uppercase tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-amber-400"></i> Presupuestos Bloqueados (Reservas para Eventos/Taller)
+              </h2>
+              <p class="text-xs text-gray-400 mt-0.5">Dinero bloqueado (ej. Rodada Circuito de Tabernas) para evitar gastarlo en otra cosa por error.</p>
+            </div>
+            <button onclick="openReserveModal()" class="admin-only px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded-lg text-xs font-bold text-black transition flex items-center gap-2">
+              <i class="fa-solid fa-plus"></i> Crear Reserva Bloqueada
+            </button>
+          </div>
+
+          <div id="reserves-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SECCIÓN 2: USUARIOS, CUOTAS Y APORTACIONES
+           ========================================== -->
+      <section id="tab-usuarios" class="tab-content hidden space-y-6">
+        <!-- Cabecera y explicación del cálculo -->
+        <div class="bg-macante-card border border-macante-border rounded-xl p-6">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-macante-border">
+            <div>
+              <h2 class="font-display text-base font-bold uppercase tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-users text-macante-red"></i> Control de Miembros, Cuotas Mensuales y Aportaciones Voluntarias
+              </h2>
+              <p class="text-xs text-gray-400 mt-1 max-w-3xl">
+                Las facturas recurrentes se dividen automáticamente entre los miembros marcados con <strong>"Paga al Mes"</strong>. Las aportaciones voluntarias descuentan equitativamente la cuota de los miembros que pagan al mes.
+              </p>
+            </div>
+
+            <!-- UN ÚNICO BOTÓN DE APORTACIÓN + BOTÓN PROTEGIDO DE REINICIO -->
+            <div class="flex flex-wrap items-center gap-3 admin-only">
+              <button onclick="openContributionModal()" class="px-5 py-2.5 bg-macante-red hover:bg-macante-redHover rounded-lg text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-red-950/50 transition flex items-center gap-2">
+                <i class="fa-solid fa-hand-holding-dollar"></i> + Registrar Aportación
+              </button>
+              <button onclick="openResetSecurityModal()" class="px-3.5 py-2.5 bg-macante-bg hover:bg-red-950/60 border border-red-900/60 text-red-400 rounded-lg text-xs font-semibold transition flex items-center gap-2" title="Requiere confirmación de seguridad">
+                <i class="fa-solid fa-shield-exclamation"></i> Reiniciar Aportaciones
+              </button>
+            </div>
+          </div>
+
+          <!-- Resumen matemático en vivo -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-5 p-4 bg-macante-bg border border-macante-border rounded-lg">
+            <div>
+              <span class="text-[11px] text-gray-400 uppercase">Gasto Mensual Facturas (IVA incl.)</span>
+              <div id="math-monthly-total" class="text-lg font-mono font-bold text-white">6,00 €</div>
+            </div>
+            <div>
+              <span class="text-[11px] text-gray-400 uppercase">Miembros que pagan cuota</span>
+              <div id="math-paying-users" class="text-lg font-mono font-bold text-white">6 miembros</div>
+            </div>
+            <div>
+              <span class="text-[11px] text-gray-400 uppercase">Cuota Mensual por Cabeza</span>
+              <div id="math-quota-per-head" class="text-lg font-mono font-bold text-macante-red">1,00 € / mes</div>
+            </div>
+            <div>
+              <span class="text-[11px] text-gray-400 uppercase">Bote Voluntario (Descuento Equitativo)</span>
+              <div id="math-voluntary-bonus" class="text-lg font-mono font-bold text-emerald-400">4,00 € (-0,67 €/c.u.)</div>
+            </div>
+          </div>
+
+          <!-- Barra rápida para añadir usuario -->
+          <form onsubmit="quickAddUser(event)" class="admin-only flex flex-wrap items-center gap-3 bg-black/40 p-3.5 rounded-lg border border-macante-border mb-5">
+            <span class="text-xs font-bold uppercase text-gray-300"><i class="fa-solid fa-user-plus text-macante-red mr-1"></i> Añadir Miembro:</span>
+            <input type="text" id="new-user-name" required placeholder="Nombre o alias (ej. Piloto 7)" class="bg-macante-card border border-macante-border rounded px-3 py-1.5 text-xs text-white focus:border-macante-red focus:outline-none flex-1 min-w-[180px]" />
+            <input type="text" id="new-user-role" placeholder="Rol (ej. Mecánico / Piloto)" class="bg-macante-card border border-macante-border rounded px-3 py-1.5 text-xs text-white focus:border-macante-red focus:outline-none w-44" />
+            <label class="flex items-center gap-2 text-xs text-gray-300 cursor-pointer select-none px-2">
+              <input type="checkbox" id="new-user-pays" checked class="accent-macante-red w-4 h-4" />
+              ¿Paga cuota cada mes?
+            </label>
+            <button type="submit" class="px-4 py-1.5 bg-white hover:bg-gray-200 text-black font-bold rounded text-xs transition">
+              + Añadir a la Tabla
+            </button>
+          </form>
+
+          <!-- Tabla de Usuarios -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-macante-border text-[11px] uppercase tracking-wider text-gray-400">
+                  <th class="py-3 px-4">Miembro</th>
+                  <th class="py-3 px-4 text-center">¿Paga cada mes?</th>
+                  <th class="py-3 px-4 text-right">Cuota Mensual</th>
+                  <th class="py-3 px-4 text-right">Saldo Cuota Aportado</th>
+                  <th class="py-3 px-4 text-right">Aportación Voluntaria</th>
+                  <th class="py-3 px-4 text-right">Descuento Recibido</th>
+                  <th class="py-3 px-4 text-center min-w-[210px]">Estado / Meses Cubiertos</th>
+                  <th class="py-3 px-4 text-right admin-only">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body" class="divide-y divide-macante-border text-sm">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SECCIÓN 3: FACTURAS, GASTOS Y DRIVE
+           ========================================== -->
+      <section id="tab-facturas" class="tab-content hidden space-y-6">
+        <div class="bg-macante-card border border-macante-border rounded-xl p-6">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-macante-border">
+            <div>
+              <h2 class="font-display text-base font-bold uppercase tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-macante-red"></i> Libro de Facturas, Gastos de Taller, Dominio y Eventos
+              </h2>
+              <p class="text-xs text-gray-400 mt-0.5">Soporta cálculo automático de IVA (21%), equivalencia mensual (diario, mensual, anual) y enlace a fotos en Google Drive.</p>
+            </div>
+            <button onclick="openInvoiceModal()" class="admin-only px-4 py-2.5 bg-macante-red hover:bg-macante-redHover rounded-lg text-xs font-bold uppercase tracking-wider text-white transition flex items-center gap-2">
+              <i class="fa-solid fa-plus"></i> + Registrar Factura / Gasto
+            </button>
+          </div>
+
+          <!-- Filtros de categoría -->
+          <div class="flex flex-wrap items-center gap-2 my-4">
+            <button onclick="filterInvoices('TODAS')" class="inv-filter px-3 py-1 rounded-full text-xs font-semibold bg-macante-red text-white">Todas</button>
+            <button onclick="filterInvoices('Dominio y Web')" class="inv-filter px-3 py-1 rounded-full text-xs font-semibold bg-macante-bg text-gray-400 hover:text-white border border-macante-border">Dominio y Web</button>
+            <button onclick="filterInvoices('Taller y Mecánica')" class="inv-filter px-3 py-1 rounded-full text-xs font-semibold bg-macante-bg text-gray-400 hover:text-white border border-macante-border">Taller y Mecánica</button>
+            <button onclick="filterInvoices('Eventos y Slalom')" class="inv-filter px-3 py-1 rounded-full text-xs font-semibold bg-macante-bg text-gray-400 hover:text-white border border-macante-border">Eventos y Slalom</button>
+            <button onclick="filterInvoices('Herramientas y Box')" class="inv-filter px-3 py-1 rounded-full text-xs font-semibold bg-macante-bg text-gray-400 hover:text-white border border-macante-border">Herramientas y Box</button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-macante-border text-[11px] uppercase tracking-wider text-gray-400">
+                  <th class="py-3 px-4">Fecha / Evento</th>
+                  <th class="py-3 px-4">Concepto y Categoría</th>
+                  <th class="py-3 px-4">Caja</th>
+                  <th class="py-3 px-4">Frecuencia</th>
+                  <th class="py-3 px-4 text-right">Importe Total (IVA)</th>
+                  <th class="py-3 px-4 text-right">Impacto al Mes</th>
+                  <th class="py-3 px-4 text-center">Ticket Drive</th>
+                  <th class="py-3 px-4 text-right admin-only">Borrar</th>
+                </tr>
+              </thead>
+              <tbody id="invoices-table-body" class="divide-y divide-macante-border text-sm">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SECCIÓN 4: INVENTARIO DEL TALLER
+           ========================================== -->
+      <section id="tab-inventario" class="tab-content hidden space-y-6">
+        <div class="bg-macante-card border border-macante-border rounded-xl p-6">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-macante-border">
+            <div>
+              <h2 class="font-display text-base font-bold uppercase tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-screwdriver-wrench text-macante-red"></i> Inventario del Taller y Recambios (Precio Variable)
+              </h2>
+              <p class="text-xs text-gray-400 mt-0.5">Al reponer stock, introduces el precio real pagado en esa compra para descontarlo de la caja y generar su factura.</p>
+            </div>
+            <button onclick="openNewItemModal()" class="admin-only px-4 py-2.5 bg-macante-red hover:bg-macante-redHover rounded-lg text-xs font-bold uppercase tracking-wider text-white transition flex items-center gap-2">
+              <i class="fa-solid fa-plus"></i> + Nueva Pieza / Consumible
+            </button>
+          </div>
+
+          <div id="inventory-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SECCIÓN 5: PATROCINADORES Y COMPROMISOS
+           ========================================== -->
+      <section id="tab-patrocinios" class="tab-content hidden space-y-6">
+        <div class="bg-macante-card border border-macante-border rounded-xl p-6">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-macante-border">
+            <div>
+              <h2 class="font-display text-base font-bold uppercase tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-handshake-simple text-macante-red"></i> Ingresos de Patrocinios y Compromisos Asociados
+              </h2>
+              <p class="text-xs text-gray-400 mt-0.5">Registra qué aportación ha hecho cada patrocinador, a qué caja ha entrado y qué compromiso tenéis (pegatinas, menciones, etc.).</p>
+            </div>
+            <button onclick="openSponsorModal()" class="admin-only px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold uppercase tracking-wider text-white transition flex items-center gap-2">
+              <i class="fa-solid fa-plus"></i> + Registrar Patrocinio
+            </button>
+          </div>
+
+          <div id="sponsors-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SECCIÓN 6: ESTADÍSTICAS VISUALES
+           ========================================== -->
+      <section id="tab-estadisticas" class="tab-content hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-macante-card border border-macante-border rounded-xl p-6">
+            <h3 class="font-display text-sm font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-chart-pie text-macante-red"></i> Gastos por Categoría (€)
+            </h3>
+            <div class="h-72 flex items-center justify-center">
+              <canvas id="chart-categories"></canvas>
+            </div>
+          </div>
+
+          <div class="bg-macante-card border border-macante-border rounded-xl p-6">
+            <h3 class="font-display text-sm font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-chart-column text-emerald-400"></i> Aportaciones Totales por Miembro (€)
+            </h3>
+            <div class="h-72 flex items-center justify-center">
+              <canvas id="chart-users"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SECCIÓN 7: REGISTRO DE ACTIVIDAD (LOG)
+           ========================================== -->
+      <section id="tab-auditoria" class="tab-content hidden space-y-6">
+        <div class="bg-macante-card border border-macante-border rounded-xl p-6">
+          <div class="flex items-center justify-between pb-4 border-b border-macante-border">
+            <div>
+              <h2 class="font-display text-base font-bold uppercase tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left text-macante-red"></i> Historial de Auditoría (Log de Actividad)
+              </h2>
+              <p class="text-xs text-gray-400 mt-0.5">Registro inmutable de quién añadió, modificó o eliminó cada movimiento en la escudería.</p>
+            </div>
+          </div>
+          <div id="audit-log-list" class="divide-y divide-macante-border mt-4 max-h-[500px] overflow-y-auto">
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- =================================================================
+       MODALES FLOTANTES (FORMULARIOS)
+       ================================================================= -->
+
+  <!-- 1. MODAL UNIFICADO: REGISTRAR APORTACIÓN (CUOTA O VOLUNTARIA) -->
+  <div id="modal-contribution" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-macante-card border border-macante-border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-macante-border pb-3">
+        <h3 class="font-display text-sm font-bold uppercase tracking-wider text-white">
+          <i class="fa-solid fa-hand-holding-dollar text-macante-red mr-1.5"></i> Registrar Aportación de Miembro
+        </h3>
+        <button onclick="closeModal('modal-contribution')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form onsubmit="submitContribution(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Seleccionar Miembro</label>
+          <select id="contrib-user" required class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white"></select>
+        </div>
+
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Tipo de Aportación</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="cursor-pointer">
+              <input type="radio" name="contrib-type" value="cuota" checked onchange="toggleContribMode()" class="peer hidden" />
+              <div class="p-3 rounded-lg border border-macante-border bg-macante-bg peer-checked:border-macante-red peer-checked:bg-red-950/30 text-center font-bold transition">
+                <i class="fa-solid fa-calendar-check block text-base mb-1 text-macante-red"></i>
+                Saldo Cuota / Meses
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="contrib-type" value="voluntaria" onchange="toggleContribMode()" class="peer hidden" />
+              <div class="p-3 rounded-lg border border-macante-border bg-macante-bg peer-checked:border-emerald-500 peer-checked:bg-emerald-950/30 text-center font-bold transition">
+                <i class="fa-solid fa-gift block text-base mb-1 text-emerald-400"></i>
+                Aportación Voluntaria
+              </div>
+            </label>
+          </div>
+          <p id="contrib-help-text" class="text-[11px] text-gray-400 mt-1.5">
+            Se suma al saldo individual del miembro para cubrir sus meses de cuota fija.
+          </p>
+        </div>
+
+        <div id="months-calculator-box" class="grid grid-cols-2 gap-3 bg-black/40 p-3 rounded-lg border border-macante-border">
+          <div>
+            <label class="block text-gray-400 mb-1">Calcular por Meses</label>
+            <input type="number" step="0.5" min="0" id="contrib-months" oninput="syncFromMonths()" placeholder="Ej: 4" class="w-full bg-macante-card border border-macante-border rounded p-2 text-white font-mono" />
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-1">Importe en Euros (€)</label>
+            <input type="number" step="0.01" min="0.01" id="contrib-amount" required oninput="syncFromAmount()" placeholder="Ej: 4.00" class="w-full bg-macante-card border border-macante-border rounded p-2 text-white font-mono" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">¿A qué caja entra este dinero?</label>
+          <select id="contrib-box" required class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white"></select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-macante-border">
+          <button type="button" onclick="closeModal('modal-contribution')" class="px-4 py-2 rounded-lg bg-macante-bg text-gray-300">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-macante-red hover:bg-macante-redHover text-white font-bold">Guardar Aportación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. MODAL PROTEGIDO: REINICIAR APORTACIONES -->
+  <div id="modal-reset-security" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-macante-card border-2 border-red-600 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center gap-3 text-red-500 border-b border-macante-border pb-3">
+        <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+        <h3 class="font-display text-sm font-bold uppercase tracking-wider text-white">Zona de Seguridad: Reiniciar Aportaciones</h3>
+      </div>
+
+      <p class="text-xs text-gray-300 leading-relaxed">
+        Esta acción pondrá a <strong>0,00 €</strong> los saldos de cuota acumulados y las aportaciones voluntarias de todos los miembros (por ejemplo, al cerrar temporada o empezar un nuevo ciclo).
+      </p>
+
+      <form onsubmit="confirmProtectedReset(event)" class="space-y-4 text-xs">
+        <label class="flex items-center gap-2 text-gray-200 cursor-pointer">
+          <input type="checkbox" id="reset-check" required class="accent-red-600 w-4 h-4" />
+          Entiendo que se reiniciarán los contadores de los miembros.
+        </label>
+
+        <div>
+          <label class="block text-gray-400 mb-1">Escribe <strong class="text-white font-mono">CONFIRMAR</strong> para desbloquear:</label>
+          <input type="text" id="reset-confirm-input" required placeholder="Escribe CONFIRMAR en mayúsculas" class="w-full bg-macante-bg border border-red-800 rounded-lg p-2.5 text-white font-mono" />
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-macante-border">
+          <button type="button" onclick="closeModal('modal-reset-security')" class="px-4 py-2 rounded-lg bg-macante-bg text-gray-300">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold">Ejecutar Reinicio</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. MODAL COMPRAR / REPONER STOCK TALLER (PRECIO VARIABLE) -->
+  <div id="modal-buy-stock" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-macante-card border border-macante-border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-macante-border pb-3">
+        <h3 class="font-display text-sm font-bold uppercase tracking-wider text-white">
+          <i class="fa-solid fa-cart-plus text-macante-red mr-1.5"></i> Comprar / Reponer Stock Taller
+        </h3>
+        <button onclick="closeModal('modal-buy-stock')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form onsubmit="submitBuyStock(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="buy-stock-id" />
+        <div>
+          <span class="text-gray-400 block">Pieza o Consumible:</span>
+          <strong id="buy-stock-name" class="text-sm text-white font-bold"></strong>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-gray-300 font-semibold mb-1">Unidades compradas</label>
+            <input type="number" id="buy-stock-qty" min="1" value="1" required class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+          </div>
+          <div>
+            <label class="block text-gray-300 font-semibold mb-1">Precio TOTAL pagado (€)</label>
+            <input type="number" step="0.01" min="0" id="buy-stock-total-price" required placeholder="Ej: 45.50" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Pagado desde la Caja:</label>
+          <select id="buy-stock-box" required class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white"></select>
+        </div>
+
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Enlace Ticket Google Drive (Opcional)</label>
+          <input type="url" id="buy-stock-drive" placeholder="https://drive.google.com/..." class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white" />
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-macante-border">
+          <button type="button" onclick="closeModal('modal-buy-stock')" class="px-4 py-2 rounded-lg bg-macante-bg text-gray-300">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-macante-red hover:bg-macante-redHover text-white font-bold">Confirmar Compra</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. MODAL REGISTRAR FACTURA / GASTO -->
+  <div id="modal-invoice" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-macante-card border border-macante-border rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-macante-border pb-3">
+        <h3 class="font-display text-sm font-bold uppercase tracking-wider text-white">
+          <i class="fa-solid fa-file-invoice-dollar text-macante-red mr-1.5"></i> Registrar Factura o Gasto
+        </h3>
+        <button onclick="closeModal('modal-invoice')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form onsubmit="submitInvoice(event)" class="space-y-3.5 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-gray-300 font-semibold mb-1">Concepto</label>
+            <input type="text" id="inv-concept" required placeholder="Ej: Hosting Dominio / Neumáticos" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white" />
+          </div>
+          <div>
+            <label class="block text-gray-300 font-semibold mb-1">Categoría</label>
+            <select id="inv-category" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white">
+              <option value="Dominio y Web">Dominio y Web</option>
+              <option value="Taller y Mecánica">Taller y Mecánica</option>
+              <option value="Eventos y Slalom">Eventos y Slalom</option>
+              <option value="Herramientas y Box">Herramientas y Box</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-gray-300 font-semibold mb-1">Importe (€)</label>
+            <input type="number" step="0.01" min="0.01" id="inv-amount" required placeholder="6.00" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+          </div>
+          <div>
+            <label class="block text-gray-300 font-semibold mb-1">Cálculo de IVA</label>
+            <select id="inv-iva" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white">
+              <option value="included">IVA ya incluido</option>
+              <option value="add21">+ Sumar 21% IVA</option>
+              <option value="none">Sin IVA / Exento</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-300 font-semibold mb-1">Frecuencia de Pago</label>
+            <select id="inv-freq" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white">
+              <option value="mensual">Mensual (Divide en cuota)</option>
+              <option value="anual">Anual (Calcula / 12 meses)</option>
+              <option value="diario">Diario (Calcula x 30 días)</option>
+              <option value="unico">Pago Único Puntual</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-gray-300 font-semibold mb-1">Caja de donde sale el dinero</label>
+            <select id="inv-box" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white"></select>
+          </div>
+          <div>
+            <label class="block text-gray-300 font-semibold mb-1">Evento asignado (Opcional)</label>
+            <input type="text" id="inv-event" placeholder="Ej: Rodada Tabernas / General" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Enlace Foto / Factura en Google Drive</label>
+          <input type="url" id="inv-drive" placeholder="https://drive.google.com/file/..." class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white" />
+        </div>
+
+        <label class="flex items-center gap-2 text-gray-300 cursor-pointer pt-1">
+          <input type="checkbox" id="inv-deduct-now" checked class="accent-macante-red w-4 h-4" />
+          Descontar este importe del saldo de la caja seleccionada ahora mismo
+        </label>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-macante-border">
+          <button type="button" onclick="closeModal('modal-invoice')" class="px-4 py-2 rounded-lg bg-macante-bg text-gray-300">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-macante-red hover:bg-macante-redHover text-white font-bold">Guardar Factura</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. MODAL NUEVA PIEZA INVENTARIO -->
+  <div id="modal-new-item" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-macante-card border border-macante-border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-macante-border pb-3">
+        <h3 class="font-display text-sm font-bold uppercase tracking-wider text-white">Añadir Pieza al Catálogo del Taller</h3>
+        <button onclick="closeModal('modal-new-item')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="submitNewInventoryItem(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Nombre del Recambio o Consumible</label>
+          <input type="text" id="item-name" required placeholder="Ej: Pastillas de Freno Competición" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-gray-300 font-semibold mb-1">Unidades actuales</label>
+            <input type="number" id="item-stock" min="0" value="1" required class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+          </div>
+          <div>
+            <label class="block text-gray-300 font-semibold mb-1">Último precio ref. (€)</label>
+            <input type="number" step="0.01" id="item-price" min="0" value="0" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-macante-border">
+          <button type="button" onclick="closeModal('modal-new-item')" class="px-4 py-2 rounded-lg bg-macante-bg text-gray-300">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-macante-red text-white font-bold">Añadir al Taller</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. MODAL AJUSTAR CAJAS -->
+  <div id="modal-boxes" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-macante-card border border-macante-border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-macante-border pb-3">
+        <h3 class="font-display text-sm font-bold uppercase tracking-wider text-white">Ajustar Saldo de Caja</h3>
+        <button onclick="closeModal('modal-boxes')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="submitBoxAdjustment(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Seleccionar Caja</label>
+          <select id="adj-box-id" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white"></select>
+        </div>
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Nuevo Saldo Real Exacto (€)</label>
+          <input type="number" step="0.01" id="adj-box-balance" required class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-macante-border">
+          <button type="button" onclick="closeModal('modal-boxes')" class="px-4 py-2 rounded-lg bg-macante-bg text-gray-300">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-macante-red text-white font-bold">Actualizar Caja</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. MODAL CREAR RESERVA BLOQUEADA -->
+  <div id="modal-reserve" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-macante-card border border-macante-border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-macante-border pb-3">
+        <h3 class="font-display text-sm font-bold uppercase tracking-wider text-white">Bloquear Presupuesto para Evento/Taller</h3>
+        <button onclick="closeModal('modal-reserve')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="submitReserve(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Objetivo de la Reserva</label>
+          <input type="text" id="res-name" required placeholder="Ej: Inscripción + Gasolina Tabernas" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white" />
+        </div>
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Cantidad a Bloquear (€)</label>
+          <input type="number" step="0.01" min="1" id="res-amount" required placeholder="150.00" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-macante-border">
+          <button type="button" onclick="closeModal('modal-reserve')" class="px-4 py-2 rounded-lg bg-macante-bg text-gray-300">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-amber-500 text-black font-bold">Bloquear Dinero</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 8. MODAL PATROCINADOR -->
+  <div id="modal-sponsor" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-macante-card border border-macante-border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-macante-border pb-3">
+        <h3 class="font-display text-sm font-bold uppercase tracking-wider text-white">Registrar Ingreso de Patrocinador</h3>
+        <button onclick="closeModal('modal-sponsor')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="submitSponsor(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Empresa / Patrocinador</label>
+          <input type="text" id="sp-name" required placeholder="Ej: Talleres Almería" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-gray-300 font-semibold mb-1">Importe aportado (€)</label>
+            <input type="number" step="0.01" min="1" id="sp-amount" required class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+          </div>
+          <div>
+            <label class="block text-gray-300 font-semibold mb-1">Caja de destino</label>
+            <select id="sp-box" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white"></select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Compromiso / Contraprestación</label>
+          <input type="text" id="sp-commitment" required placeholder="Ej: Pegatina en capó + mención en Instagram" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white" />
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-macante-border">
+          <button type="button" onclick="closeModal('modal-sponsor')" class="px-4 py-2 rounded-lg bg-macante-bg text-gray-300">Cancelar</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-emerald-600 text-white font-bold">Registrar y Sumar a Caja</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =================================================================
+       LÓGICA DE APLICACIÓN + CONEXIÓN FIREBASE REAL-TIME
+       ================================================================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+    // CREDENCIALES OFICIALES DE GESTOR-MACANTE-RACING
+    const firebaseConfig = {
+      apiKey: "AIzaSyCQocNuIUp9RywVA_mYikqj6jgR9wVW1-0",
+      authDomain: "gestor-macante-racing.firebaseapp.com",
+      projectId: "gestor-macante-racing",
+      storageBucket: "gestor-macante-racing.firebasestorage.app",
+      messagingSenderId: "463016580160",
+      appId: "1:463016580160:web:76062f715378f95e71fba5",
+      measurementId: "G-B0V8M0TGZJ"
+    };
+
+    // Estado inicial con el ejemplo exacto pedido
+    const defaultState = {
+      boxes: [
+        { id: 'banco', name: 'Cuenta General / Banco', balance: 420.00, icon: 'fa-building-columns' },
+        { id: 'bizum', name: 'Fondo Bizum Equipo', balance: 85.00, icon: 'fa-mobile-screen-button' },
+        { id: 'efectivo', name: 'Efectivo en Box / Taller', balance: 50.00, icon: 'fa-money-bill-wave' },
+        { id: 'hucha', name: 'Hucha Emergencias', balance: 30.00, icon: 'fa-piggy-bank' }
+      ],
+      reserves: [
+        { id: 'res1', name: 'Rodada Circuito de Tabernas', amount: 200.00 }
+      ],
+      users: [
+        { id: 'u1', name: 'Usuario 1 (Colaborador)', role: 'Apoyo Externo', paysMonthly: false, paidQuota: 0.00, voluntary: 4.00 },
+        { id: 'u2', name: 'Usuario 2 (Stefan)', role: 'Encargado / Piloto', paysMonthly: true, paidQuota: 4.00, voluntary: 0.00 },
+        { id: 'u3', name: 'Usuario 3', role: 'Encargado / Mecánico', paysMonthly: true, paidQuota: 2.00, voluntary: 0.00 },
+        { id: 'u4', name: 'Usuario 4', role: 'Encargado / Piloto', paysMonthly: true, paidQuota: 1.00, voluntary: 0.00 },
+        { id: 'u5', name: 'Usuario 5', role: 'Encargado / Logística', paysMonthly: true, paidQuota: 1.00, voluntary: 0.00 },
+        { id: 'u6', name: 'Usuario 6', role: 'Equipo', paysMonthly: true, paidQuota: 0.00, voluntary: 0.00 },
+        { id: 'u7', name: 'Usuario 7', role: 'Equipo', paysMonthly: true, paidQuota: 1.00, voluntary: 0.00 }
+      ],
+      invoices: [
+        {
+          id: 'inv1',
+          date: '2026-11-01',
+          concept: 'Mantenimiento Dominio y Servidor Web',
+          category: 'Dominio y Web',
+          boxId: 'banco',
+          freq: 'mensual',
+          totalAmount: 6.00,
+          monthlyImpact: 6.00,
+          ivaMode: 'IVA incl.',
+          event: 'Infraestructura Anual',
+          driveUrl: 'https://drive.google.com/'
+        }
+      ],
+      inventory: [
+        { id: 'it1', name: 'Aceite Competición 10W-60 (Garrafa 5L)', stock: 2, lastPrice: 48.00 },
+        { id: 'it2', name: 'Líquido de Frenos Racing DOT 4 (500ml)', stock: 3, lastPrice: 14.50 },
+        { id: 'it3', name: 'Spray Limpiador de Frenos Taller', stock: 5, lastPrice: 3.80 }
+      ],
+      sponsors: [
+        { id: 'sp1', name: 'MacandoFotoGR', amount: 100.00, commitment: 'Cobertura fotográfica oficial y pegatina trasera', date: '2026-10-15' }
+      ],
+      logs: [
+        { id: 'l1', time: '02/11/2026 20:45', user: 'Usuario 2 (Stefan)', action: 'Configuración inicial del sistema financiero Macante Racing' }
+      ]
+    };
+
+    let state = JSON.parse(localStorage.getItem('macante_finance_state')) || defaultState;
+    let activeOperator = state.users[1]?.name || 'Encargado';
+    let currentInvoiceFilter = 'TODAS';
+    let db = null;
+    let stateDocRef = null;
+    let categoryChart = null;
+    let userChart = null;
+
+    // Inicializar Firebase y escuchar en tiempo real
+    try {
+      const app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+      stateDocRef = doc(db, "macante_escuderia", "estado_global");
+
+      onSnapshot(stateDocRef, (snapshot) => {
+        const badge = document.getElementById('cloud-status');
+        if (snapshot.exists()) {
+          state = snapshot.data();
+          localStorage.setItem('macante_finance_state', JSON.stringify(state));
+          renderAll();
+        } else {
+          // Subir el estado inicial si la base de datos recién creada está vacía
+          setDoc(stateDocRef, state);
+        }
+        badge.className = "flex items-center gap-1.5 font-mono text-emerald-400";
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Sincronizado`;
+      }, (error) => {
+        console.warn("Aviso Firestore:", error);
+        const badge = document.getElementById('cloud-status');
+        badge.className = "flex items-center gap-1.5 font-mono text-amber-400";
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span> Modo Local`;
+      });
+    } catch (e) {
+      console.error("Error inicializando Firebase:", e);
+    }
+
+    // Guardar estado y registrar en el Log
+    async function saveState(actionDescription) {
+      if (actionDescription) {
+        const now = new Date().toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        state.logs.unshift({
+          id: 'log_' + Date.now(),
+          time: now,
+          user: activeOperator,
+          action: actionDescription
+        });
+        if (state.logs.length > 100) state.logs.pop();
+      }
+
+      localStorage.setItem('macante_finance_state', JSON.stringify(state));
+      renderAll();
+
+      if (stateDocRef) {
+        try {
+          await setDoc(stateDocRef, state);
+        } catch (err) {
+          console.error("Error guardando en Firestore:", err);
+        }
+      }
+    }
+
+    // Cálculos matemáticos centrales de cuotas
+    function calculateQuotaMetrics() {
+      const monthlyBurn = state.invoices.reduce((acc, inv) => acc + (Number(inv.monthlyImpact) || 0), 0);
+      const payingUsers = state.users.filter(u => u.paysMonthly);
+      const numPaying = payingUsers.length || 1;
+      const totalVoluntaryPool = state.users.reduce((acc, u) => acc + (Number(u.voluntary) || 0), 0);
+
+      // Cuota base mensual por miembro que paga
+      const baseQuotaPerHead = monthlyBurn / numPaying;
+      // Descuento equitativo gracias a las aportaciones voluntarias
+      const voluntaryBonusPerHead = totalVoluntaryPool / numPaying;
+
+      return {
+        monthlyBurn,
+        numPaying,
+        totalVoluntaryPool,
+        baseQuotaPerHead,
+        voluntaryBonusPerHead
+      };
+    }
+
+    // Renderizado general
+    function renderAll() {
+      renderOperatorSelect();
+      renderDashboard();
+      renderUsersTable();
+      renderInvoicesTable();
+      renderInventory();
+      renderSponsors();
+      renderAuditLog();
+      populateBoxSelectors();
+      updateCharts();
+    }
+
+    function formatEUR(num) {
+      return Number(num || 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+    }
+
+    function renderOperatorSelect() {
+      const sel = document.getElementById('active-operator');
+      if (!sel) return;
+      sel.innerHTML = state.users.map(u => `<option value="${u.name}" ${u.name === activeOperator ? 'selected' : ''}>${u.name}</option>`).join('');
+    }
+
+    // 1. Renderizar Dashboard y Cajas
+    function renderDashboard() {
+      const totalMoney = state.boxes.reduce((acc, b) => acc + Number(b.balance), 0);
+      const lockedMoney = state.reserves.reduce((acc, r) => acc + Number(r.amount), 0);
+      const freeMoney = totalMoney - lockedMoney;
+      const metrics = calculateQuotaMetrics();
+
+      document.getElementById('kpi-total-money').textContent = formatEUR(totalMoney);
+      document.getElementById('kpi-free-money').textContent = formatEUR(freeMoney);
+      document.getElementById('kpi-locked-money').textContent = formatEUR(lockedMoney);
+      document.getElementById('kpi-monthly-burn').textContent = formatEUR(metrics.monthlyBurn) + '/mes';
+      document.getElementById('kpi-quota-summary').textContent = `${formatEUR(metrics.baseQuotaPerHead)} por cabeza (${metrics.numPaying} pagadores)`;
+
+      // Alerta de números rojos
+      const anyNegativeBox = state.boxes.some(b => b.balance < 0);
+      const alertBanner = document.getElementById('red-alert-banner');
+      if (freeMoney < 0 || anyNegativeBox) {
+        alertBanner.classList.remove('hidden');
+        document.getElementById('kpi-free-money').className = "text-2xl font-mono font-bold text-red-500 mt-2";
+      } else {
+        alertBanner.classList.add('hidden');
+        document.getElementById('kpi-free-money').className = "text-2xl font-mono font-bold text-emerald-400 mt-2";
+      }
+
+      // Cajas
+      document.getElementById('boxes-grid').innerHTML = state.boxes.map(b => `
+        <div class="bg-macante-bg border ${b.balance < 0 ? 'border-red-600' : 'border-macante-border'} rounded-xl p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between text-gray-400 text-xs">
+            <span class="font-semibold">${b.name}</span>
+            <i class="fa-solid ${b.icon} text-macante-red"></i>
+          </div>
+          <div class="text-xl font-mono font-bold ${b.balance < 0 ? 'text-red-500' : 'text-white'} mt-3">
+            ${formatEUR(b.balance)}
+          </div>
+        </div>
+      `).join('');
+
+      // Reservas
+      const resGrid = document.getElementById('reserves-grid');
+      if (state.reserves.length === 0) {
+        resGrid.innerHTML = `<p class="text-xs text-gray-500 col-span-3">No hay fondos bloqueados actualmente.</p>`;
+      } else {
+        resGrid.innerHTML = state.reserves.map(r => `
+          <div class="bg-macante-bg border border-amber-500/30 rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">Reserva Activa</span>
+              <h4 class="text-sm font-bold text-white mt-1.5">${r.name}</h4>
+              <p class="text-base font-mono font-bold text-amber-400 mt-0.5">${formatEUR(r.amount)}</p>
+            </div>
+            <button onclick="deleteReserve('${r.id}')" class="admin-only text-gray-400 hover:text-red-400 p-2" title="Liberar reserva">
+              <i class="fa-solid fa-unlock"></i>
+            </button>
+          </div>
+        `).join('');
+      }
+    }
+
+    // 2. Renderizar Tabla de Usuarios y Cuotas (Sin colapsos en las etiquetas)
+    function renderUsersTable() {
+      const m = calculateQuotaMetrics();
+      document.getElementById('math-monthly-total').textContent = formatEUR(m.monthlyBurn);
+      document.getElementById('math-paying-users').textContent = `${m.numPaying} miembros`;
+      document.getElementById('math-quota-per-head').textContent = `${formatEUR(m.baseQuotaPerHead)} / mes`;
+      document.getElementById('math-voluntary-bonus').textContent = `${formatEUR(m.totalVoluntaryPool)} (+${formatEUR(m.voluntaryBonusPerHead)}/c.u.)`;
+
+      const tbody = document.getElementById('users-table-body');
+      tbody.innerHTML = state.users.map(u => {
+        let statusBadge = '';
+        if (!u.paysMonthly) {
+          statusBadge = `<span class="status-pill bg-purple-950/80 border border-purple-500/50 text-purple-300">EXENTO (${formatEUR(u.voluntary)} vol.)</span>`;
+        } else {
+          // Meses cubiertos directos por su cuota pagada + meses extra por el descuento voluntario
+          const effectiveCredit = Number(u.paidQuota);
+          const monthsCovered = m.baseQuotaPerHead > 0 ? (effectiveCredit / m.baseQuotaPerHead) : 0;
+
+          if (monthsCovered >= 1) {
+            statusBadge = `<span class="status-pill bg-emerald-950/80 border border-emerald-500/60 text-emerald-300">CUBIERTO (${monthsCovered.toFixed(2)} meses)</span>`;
+          } else if (monthsCovered > 0) {
+            statusBadge = `<span class="status-pill bg-amber-950/80 border border-amber-500/60 text-amber-300">PARCIAL (${monthsCovered.toFixed(2)} meses)</span>`;
+          } else {
+            statusBadge = `<span class="status-pill bg-red-950/80 border border-red-500/60 text-red-300">PENDIENTE (0 meses)</span>`;
+          }
+        }
+
+        return `
+          <tr class="hover:bg-white/[0.02] transition">
+            <td class="py-3.5 px-4">
+              <div class="font-bold text-white">${u.name}</div>
+              <div class="text-xs text-gray-400">${u.role || 'Miembro'}</div>
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              <input type="checkbox" ${u.paysMonthly ? 'checked' : ''} onchange="toggleUserMonthly('${u.id}')" class="accent-macante-red w-4 h-4 cursor-pointer" />
+            </td>
+            <td class="py-3.5 px-4 text-right font-mono text-gray-300">
+              ${u.paysMonthly ? formatEUR(m.baseQuotaPerHead) : '0,00 €'}
+            </td>
+            <td class="py-3.5 px-4 text-right font-mono font-bold text-white">
+              ${formatEUR(u.paidQuota)}
+            </td>
+            <td class="py-3.5 px-4 text-right font-mono text-emerald-400">
+              ${formatEUR(u.voluntary)}
+            </td>
+            <td class="py-3.5 px-4 text-right font-mono text-xs text-emerald-300">
+              ${u.paysMonthly ? '+' + formatEUR(m.voluntaryBonusPerHead) : '—'}
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              ${statusBadge}
+            </td>
+            <td class="py-3.5 px-4 text-right admin-only">
+              <button onclick="removeUser('${u.id}')" class="text-gray-500 hover:text-red-500 px-2 py-1 transition" title="Eliminar miembro">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 3. Renderizar Facturas
+    function renderInvoicesTable() {
+      const tbody = document.getElementById('invoices-table-body');
+      const filtered = currentInvoiceFilter === 'TODAS'
+        ? state.invoices
+        : state.invoices.filter(i => i.category === currentInvoiceFilter);
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-xs text-gray-500">No hay facturas en esta categoría.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(inv => {
+        const boxName = state.boxes.find(b => b.id === inv.boxId)?.name || inv.boxId;
+        return `
+          <tr class="hover:bg-white/[0.02]">
+            <td class="py-3 px-4 text-xs">
+              <div class="font-mono text-gray-300">${inv.date}</div>
+              <div class="text-[11px] text-macante-red font-semibold">${inv.event || 'General'}</div>
+            </td>
+            <td class="py-3 px-4">
+              <div class="font-bold text-white">${inv.concept}</div>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-macante-bg border border-macante-border text-gray-400">${inv.category}</span>
+            </td>
+            <td class="py-3 px-4 text-xs text-gray-300">${boxName}</td>
+            <td class="py-3 px-4 text-xs uppercase font-mono text-gray-300">${inv.freq}</td>
+            <td class="py-3 px-4 text-right font-mono font-bold text-white">
+              ${formatEUR(inv.totalAmount)}
+              <div class="text-[10px] text-gray-400">${inv.ivaMode}</div>
+            </td>
+            <td class="py-3 px-4 text-right font-mono text-macante-red font-bold">
+              ${inv.monthlyImpact > 0 ? formatEUR(inv.monthlyImpact) + '/mes' : 'Puntual'}
+            </td>
+            <td class="py-3 px-4 text-center">
+              ${inv.driveUrl ? `<a href="${inv.driveUrl}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-blue-950/60 border border-blue-500/40 text-blue-300 text-xs hover:bg-blue-900/60"><i class="fa-brands fa-google-drive"></i> Ver Foto</a>` : '<span class="text-xs text-gray-600">—</span>'}
+            </td>
+            <td class="py-3 px-4 text-right admin-only">
+              <button onclick="deleteInvoice('${inv.id}')" class="text-gray-500 hover:text-red-500 p-1"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 4. Renderizar Inventario (Sin precio fijo en el botón)
+    function renderInventory() {
+      const grid = document.getElementById('inventory-grid');
+      grid.innerHTML = state.inventory.map(item => `
+        <div class="bg-macante-bg border border-macante-border rounded-xl p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${item.stock > 0 ? 'bg-emerald-950 text-emerald-400 border border-emerald-600/40' : 'bg-red-950 text-red-400 border border-red-600/40'}">
+                ${item.stock > 0 ? 'EN STOCK' : 'AGOTADO'}
+              </span>
+              <span class="text-xs font-mono text-gray-400">Últ. ref: ${formatEUR(item.lastPrice)}</span>
+            </div>
+            <h4 class="font-bold text-white text-base">${item.name}</h4>
+            <div class="mt-3 flex items-baseline gap-2">
+              <span class="text-3xl font-mono font-bold text-white">${item.stock}</span>
+              <span class="text-xs text-gray-400">unidades en taller</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between gap-2 mt-5 pt-4 border-t border-macante-border admin-only">
+            <button onclick="useInventoryUnit('${item.id}')" class="px-3 py-2 rounded-lg bg-macante-card hover:bg-gray-800 border border-macante-border text-xs font-semibold text-gray-300 transition">
+              -1 Usar en Coche
+            </button>
+            <button onclick="openBuyStockModal('${item.id}')" class="px-3.5 py-2 rounded-lg bg-macante-red hover:bg-macante-redHover text-xs font-bold text-white transition flex items-center gap-1.5">
+              <i class="fa-solid fa-cart-shopping"></i> + Comprar Stock
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 5. Renderizar Patrocinadores
+    function renderSponsors() {
+      const grid = document.getElementById('sponsors-grid');
+      grid.innerHTML = state.sponsors.map(sp => `
+        <div class="bg-macante-bg border border-macante-border rounded-xl p-4 flex justify-between items-start">
+          <div>
+            <span class="text-[11px] font-mono text-gray-400">${sp.date}</span>
+            <h4 class="text-base font-bold text-white">${sp.name}</h4>
+            <p class="text-xs text-gray-300 mt-1"><i class="fa-solid fa-check-double text-emerald-400 mr-1"></i> <strong>Compromiso:</strong> ${sp.commitment}</p>
+          </div>
+          <span class="font-mono font-bold text-emerald-400 text-base">+${formatEUR(sp.amount)}</span>
+        </div>
+      `).join('');
+    }
+
+    // 6. Renderizar Historial (Log)
+    function renderAuditLog() {
+      const list = document.getElementById('audit-log-list');
+      list.innerHTML = state.logs.map(l => `
+        <div class="py-2.5 flex items-center justify-between text-xs">
+          <div>
+            <span class="font-bold text-macante-red mr-2">[${l.user}]</span>
+            <span class="text-gray-200">${l.action}</span>
+          </div>
+          <span class="font-mono text-gray-500 text-[11px]">${l.time}</span>
+        </div>
+      `).join('');
+    }
+
+    // 7. Actualizar Gráficas
+    function updateCharts() {
+      const catCanvas = document.getElementById('chart-categories');
+      const usrCanvas = document.getElementById('chart-users');
+      if (!catCanvas || !usrCanvas) return;
+
+      const categories = ['Dominio y Web', 'Taller y Mecánica', 'Eventos y Slalom', 'Herramientas y Box'];
+      const catTotals = categories.map(c =>
+        state.invoices.filter(i => i.category === c).reduce((acc, i) => acc + Number(i.totalAmount), 0)
+      );
+
+      if (categoryChart) categoryChart.destroy();
+      categoryChart = new Chart(catCanvas, {
+        type: 'doughnut',
+        data: {
+          labels: categories,
+          datasets: [{
+            data: catTotals,
+            backgroundColor: ['#e60000', '#f59e0b', '#10b981', '#3b82f6'],
+            borderColor: '#121418',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          plugins: { legend: { labels: { color: '#d1d5db' } } }
+        }
+      });
+
+      if (userChart) userChart.destroy();
+      userChart = new Chart(usrCanvas, {
+        type: 'bar',
+        data: {
+          labels: state.users.map(u => u.name),
+          datasets: [
+            {
+              label: 'Saldo Cuota (€)',
+              data: state.users.map(u => u.paidQuota),
+              backgroundColor: '#e60000'
+            },
+            {
+              label: 'Aportación Voluntaria (€)',
+              data: state.users.map(u => u.voluntary),
+              backgroundColor: '#10b981'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: { ticks: { color: '#9ca3af' } },
+            y: { ticks: { color: '#9ca3af' } }
+          },
+          plugins: { legend: { labels: { color: '#d1d5db' } } }
+        }
+      });
+    }
+
+    function populateBoxSelectors() {
+      const options = state.boxes.map(b => `<option value="${b.id}">${b.name} (${formatEUR(b.balance)})</option>`).join('');
+      ['contrib-box', 'buy-stock-box', 'inv-box', 'adj-box-id', 'sp-box'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = options;
+      });
+    }
+
+    // =========================================================
+    // FUNCIONES EXPUESTAS A LA INTERFAZ (WINDOW)
+    // =========================================================
+    window.switchTab = (tabName) => {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-300 hover:bg-white/5 transition";
+      });
+      document.getElementById(`nav-${tabName}`).className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition bg-macante-red text-white";
+
+      if (tabName === 'estadisticas') updateCharts();
+    };
+
+    window.changeOperator = (val) => { activeOperator = val; };
+
+    window.setReadOnlyMode = (isReadOnly) => {
+      document.body.classList.toggle('readonly-mode', isReadOnly);
+      document.getElementById('btn-mode-edit').className = isReadOnly
+        ? "px-3 py-1 rounded text-xs font-semibold text-gray-400 hover:text-white transition"
+        : "px-3 py-1 rounded text-xs font-semibold bg-macante-red text-white transition";
+      document.getElementById('btn-mode-read').className = isReadOnly
+        ? "px-3 py-1 rounded text-xs font-semibold bg-macante-red text-white transition"
+        : "px-3 py-1 rounded text-xs font-semibold text-gray-400 hover:text-white transition";
+    };
+
+    window.closeModal = (id) => {
+      const m = document.getElementById(id);
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    };
+
+    function showModal(id) {
+      const m = document.getElementById(id);
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    // Gestión de Usuarios
+    window.quickAddUser = (e) => {
+      e.preventDefault();
+      const name = document.getElementById('new-user-name').value.trim();
+      const role = document.getElementById('new-user-role').value.trim() || 'Miembro';
+      const pays = document.getElementById('new-user-pays').checked;
+      if (!name) return;
+
+      state.users.push({
+        id: 'u_' + Date.now(),
+        name,
+        role,
+        paysMonthly: pays,
+        paidQuota: 0,
+        voluntary: 0
+      });
+      document.getElementById('new-user-name').value = '';
+      document.getElementById('new-user-role').value = '';
+      saveState(`Añadió al miembro "${name}"`);
+    };
+
+    window.toggleUserMonthly = (userId) => {
+      const u = state.users.find(x => x.id === userId);
+      if (!u) return;
+      u.paysMonthly = !u.paysMonthly;
+      saveState(`Cambió el estado de pago mensual de ${u.name}`);
+    };
+
+    window.removeUser = (userId) => {
+      const u = state.users.find(x => x.id === userId);
+      if (!u || !confirm(`¿Seguro que deseas eliminar a "${u.name}" de la tabla?`)) return;
+      state.users = state.users.filter(x => x.id !== userId);
+      saveState(`Eliminó al usuario ${u.name}`);
+    };
+
+    // Modal Unificado de Aportación
+    window.openContributionModal = () => {
+      const sel = document.getElementById('contrib-user');
+      sel.innerHTML = state.users.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
+      document.getElementById('contrib-months').value = '';
+      document.getElementById('contrib-amount').value = '';
+      showModal('modal-contribution');
+    };
+
+    window.toggleContribMode = () => {
+      const type = document.querySelector('input[name="contrib-type"]:checked').value;
+      const help = document.getElementById('contrib-help-text');
+      if (type === 'voluntaria') {
+        help.textContent = "Se añade al bote voluntario y descuenta equitativamente las facturas de los que pagan al mes.";
+      } else {
+        help.textContent = "Se suma al saldo individual del miembro para cubrir sus meses de cuota fija.";
+      }
+    };
+
+    window.syncFromMonths = () => {
+      const months = parseFloat(document.getElementById('contrib-months').value) || 0;
+      const m = calculateQuotaMetrics();
+      const quota = m.baseQuotaPerHead > 0 ? m.baseQuotaPerHead : 1;
+      document.getElementById('contrib-amount').value = (months * quota).toFixed(2);
+    };
+
+    window.syncFromAmount = () => {
+      const amount = parseFloat(document.getElementById('contrib-amount').value) || 0;
+      const m = calculateQuotaMetrics();
+      const quota = m.baseQuotaPerHead > 0 ? m.baseQuotaPerHead : 1;
+      document.getElementById('contrib-months').value = (amount / quota).toFixed(2);
+    };
+
+    window.submitContribution = (e) => {
+      e.preventDefault();
+      const userId = document.getElementById('contrib-user').value;
+      const type = document.querySelector('input[name="contrib-type"]:checked').value;
+      const amount = parseFloat(document.getElementById('contrib-amount').value) || 0;
+      const boxId = document.getElementById('contrib-box').value;
+
+      const user = state.users.find(u => u.id === userId);
+      const box = state.boxes.find(b => b.id === boxId);
+      if (!user || !box || amount <= 0) return;
+
+      if (type === 'voluntaria') {
+        user.voluntary = Number(user.voluntary) + amount;
+      } else {
+        user.paidQuota = Number(user.paidQuota) + amount;
+      }
+      box.balance = Number(box.balance) + amount;
+
+      closeModal('modal-contribution');
+      saveState(`Registró aportación (${type}) de ${formatEUR(amount)} de ${user.name} en ${box.name}`);
+    };
+
+    // Reinicio Protegido
+    window.openResetSecurityModal = () => {
+      document.getElementById('reset-check').checked = false;
+      document.getElementById('reset-confirm-input').value = '';
+      showModal('modal-reset-security');
+    };
+
+    window.confirmProtectedReset = (e) => {
+      e.preventDefault();
+      const word = document.getElementById('reset-confirm-input').value.trim();
+      if (word !== 'CONFIRMAR') {
+        alert('Debes escribir exactamente la palabra CONFIRMAR en mayúsculas.');
+        return;
+      }
+      state.users.forEach(u => {
+        u.paidQuota = 0;
+        u.voluntary = 0;
+      });
+      closeModal('modal-reset-security');
+      saveState('REINICIÓ todas las aportaciones y saldos de los usuarios a 0,00 €');
+    };
+
+    // Facturas
+    window.openInvoiceModal = () => showModal('modal-invoice');
+
+    window.submitInvoice = (e) => {
+      e.preventDefault();
+      const concept = document.getElementById('inv-concept').value.trim();
+      const category = document.getElementById('inv-category').value;
+      const rawAmount = parseFloat(document.getElementById('inv-amount').value) || 0;
+      const iva = document.getElementById('inv-iva').value;
+      const freq = document.getElementById('inv-freq').value;
+      const boxId = document.getElementById('inv-box').value;
+      const eventName = document.getElementById('inv-event').value.trim() || 'General';
+      const driveUrl = document.getElementById('inv-drive').value.trim();
+      const deductNow = document.getElementById('inv-deduct-now').checked;
+
+      const totalAmount = iva === 'add21' ? rawAmount * 1.21 : rawAmount;
+      const ivaLabel = iva === 'add21' ? '+21% IVA apl.' : (iva === 'included' ? 'IVA incl.' : 'Exento IVA');
+
+      let monthlyImpact = 0;
+      if (freq === 'mensual') monthlyImpact = totalAmount;
+      else if (freq === 'anual') monthlyImpact = totalAmount / 12;
+      else if (freq === 'diario') monthlyImpact = totalAmount * 30;
+
+      state.invoices.unshift({
+        id: 'inv_' + Date.now(),
+        date: new Date().toISOString().slice(0, 10),
+        concept,
+        category,
+        boxId,
+        freq,
+        totalAmount,
+        monthlyImpact,
+        ivaMode: ivaLabel,
+        event: eventName,
+        driveUrl
+      });
+
+      if (deductNow) {
+        const box = state.boxes.find(b => b.id === boxId);
+        if (box) box.balance = Number(box.balance) - totalAmount;
+      }
+
+      closeModal('modal-invoice');
+      e.target.reset();
+      saveState(`Añadió factura "${concept}" por ${formatEUR(totalAmount)} (${freq})`);
+    };
+
+    window.filterInvoices = (cat) => {
+      currentInvoiceFilter = cat;
+      renderInvoicesTable();
+    };
+
+    window.deleteInvoice = (id) => {
+      const inv = state.invoices.find(i => i.id === id);
+      if (!inv || !confirm(`¿Eliminar la factura "${inv.concept}"?`)) return;
+      state.invoices = state.invoices.filter(i => i.id !== id);
+      saveState(`Eliminó la factura "${inv.concept}"`);
+    };
+
+    // Inventario con Precio Variable
+    window.openNewItemModal = () => showModal('modal-new-item');
+
+    window.submitNewInventoryItem = (e) => {
+      e.preventDefault();
+      const name = document.getElementById('item-name').value.trim();
+      const stock = parseInt(document.getElementById('item-stock').value) || 0;
+      const lastPrice = parseFloat(document.getElementById('item-price').value) || 0;
+
+      state.inventory.push({ id: 'it_' + Date.now(), name, stock, lastPrice });
+      closeModal('modal-new-item');
+      e.target.reset();
+      saveState(`Añadió pieza "${name}" al inventario del taller`);
+    };
+
+    window.useInventoryUnit = (itemId) => {
+      const item = state.inventory.find(i => i.id === itemId);
+      if (!item || item.stock <= 0) return;
+      item.stock -= 1;
+      saveState(`Usó 1 ud. de "${item.name}" en el coche (Quedan ${item.stock})`);
+    };
+
+    window.openBuyStockModal = (itemId) => {
+      const item = state.inventory.find(i => i.id === itemId);
+      if (!item) return;
+      document.getElementById('buy-stock-id').value = item.id;
+      document.getElementById('buy-stock-name').textContent = item.name;
+      document.getElementById('buy-stock-qty').value = 1;
+      document.getElementById('buy-stock-total-price').value = item.lastPrice || '';
+      document.getElementById('buy-stock-drive').value = '';
+      showModal('modal-buy-stock');
+    };
+
+    window.submitBuyStock = (e) => {
+      e.preventDefault();
+      const id = document.getElementById('buy-stock-id').value;
+      const qty = parseInt(document.getElementById('buy-stock-qty').value) || 1;
+      const totalPaid = parseFloat(document.getElementById('buy-stock-total-price').value) || 0;
+      const boxId = document.getElementById('buy-stock-box').value;
+      const driveUrl = document.getElementById('buy-stock-drive').value.trim();
+
+      const item = state.inventory.find(i => i.id === id);
+      const box = state.boxes.find(b => b.id === boxId);
+      if (!item || !box) return;
+
+      item.stock += qty;
+      item.lastPrice = +(totalPaid / qty).toFixed(2);
+      box.balance -= totalPaid;
+
+      state.invoices.unshift({
+        id: 'inv_' + Date.now(),
+        date: new Date().toISOString().slice(0, 10),
+        concept: `Compra Stock (${qty}x) ${item.name}`,
+        category: 'Taller y Mecánica',
+        boxId,
+        freq: 'unico',
+        totalAmount: totalPaid,
+        monthlyImpact: 0,
+        ivaMode: 'IVA incl.',
+        event: 'Repuesto Taller',
+        driveUrl
+      });
+
+      closeModal('modal-buy-stock');
+      saveState(`Compró ${qty} ud. de "${item.name}" por ${formatEUR(totalPaid)}`);
+    };
+
+    // Cajas, Reservas y Patrocinios
+    window.openBoxModal = () => showModal('modal-boxes');
+    window.submitBoxAdjustment = (e) => {
+      e.preventDefault();
+      const boxId = document.getElementById('adj-box-id').value;
+      const newBal = parseFloat(document.getElementById('adj-box-balance').value) || 0;
+      const box = state.boxes.find(b => b.id === boxId);
+      if (!box) return;
+      box.balance = newBal;
+      closeModal('modal-boxes');
+      saveState(`Ajustó el saldo de "${box.name}" a ${formatEUR(newBal)}`);
+    };
+
+    window.openReserveModal = () => showModal('modal-reserve');
+    window.submitReserve = (e) => {
+      e.preventDefault();
+      const name = document.getElementById('res-name').value.trim();
+      const amount = parseFloat(document.getElementById('res-amount').value) || 0;
+      state.reserves.push({ id: 'res_' + Date.now(), name, amount });
+      closeModal('modal-reserve');
+      e.target.reset();
+      saveState(`Bloqueó reserva de ${formatEUR(amount)} para "${name}"`);
+    };
+
+    window.deleteReserve = (id) => {
+      const r = state.reserves.find(x => x.id === id);
+      if (!r || !confirm(`¿Liberar el dinero reservado para "${r.name}"?`)) return;
+      state.reserves = state.reserves.filter(x => x.id !== id);
+      saveState(`Liberó la reserva "${r.name}"`);
+    };
+
+    window.openSponsorModal = () => showModal('modal-sponsor');
+    window.submitSponsor = (e) => {
+      e.preventDefault();
+      const name = document.getElementById('sp-name').value.trim();
+      const amount = parseFloat(document.getElementById('sp-amount').value) || 0;
+      const boxId = document.getElementById('sp-box').value;
+      const commitment = document.getElementById('sp-commitment').value.trim();
+
+      const box = state.boxes.find(b => b.id === boxId);
+      if (box) box.balance += amount;
+
+      state.sponsors.unshift({
+        id: 'sp_' + Date.now(),
+        name,
+        amount,
+        commitment,
+        date: new Date().toISOString().slice(0, 10)
+      });
+      closeModal('modal-sponsor');
+      e.target.reset();
+      saveState(`Registró patrocinio de "${name}" (+${formatEUR(amount)})`);
+    };
+
+    window.exportBackupJSON = () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `macante_racing_backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+    };
+
+    // Primer renderizado al cargar
+    renderAll();
+  </script>
+</body>
+</html>
