@@ -524,15 +524,10 @@
           </p>
         </div>
 
-        <div id="months-calculator-box" class="grid grid-cols-2 gap-3 bg-black/40 p-3 rounded-lg border border-macante-border">
-          <div>
-            <label class="block text-gray-400 mb-1">Calcular por Meses</label>
-            <input type="text" min="0" id="contrib-months" oninput="syncFromMonths()" placeholder="Ej: 4" class="w-full bg-macante-card border border-macante-border rounded p-2 text-white font-mono" />
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-1">Importe en Euros (€)</label>
-            <input type="number" step="0.01" min="0.01" id="contrib-amount" required oninput="syncFromAmount()" placeholder="Ej: 4.00" class="w-full bg-macante-card border border-macante-border rounded p-2 text-white font-mono" />
-          </div>
+        <div class="bg-black/40 p-3 rounded-lg border border-macante-border">
+          <label class="block text-gray-300 font-semibold mb-1">Importe a aportar en Euros (€)</label>
+          <input type="number" step="0.01" min="0.01" id="contrib-amount" required placeholder="Ej: 0.61" class="w-full bg-macante-card border border-macante-border rounded-lg p-2.5 text-white font-mono text-base" />
+          <p class="text-[11px] text-gray-400 mt-1">El sistema sumará este dinero a la caja y actualizará automáticamente los meses cubiertos del miembro en la tabla.</p>
         </div>
 
         <div>
