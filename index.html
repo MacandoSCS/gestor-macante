@@ -1379,7 +1379,7 @@
       const amount = parseFloat(document.getElementById('contrib-amount').value) || 0;
       const m = calculateQuotaMetrics();
       const quota = m.baseQuotaPerHead > 0 ? m.baseQuotaPerHead : 1;
-      document.getElementById('contrib-months').value = (amount / quota).toFixed(2);
+      document.getElementById('contrib-months').value = quota > 0 ? (amount / quota).toFixed(2) : '0';
     };
 
     window.submitContribution = (e) => {
