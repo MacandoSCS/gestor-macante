@@ -77,17 +77,11 @@
       <!-- LOGO MACANTE RACING -->
       <div class="p-6 border-b border-macante-border flex flex-col items-center text-center bg-black/60">
         <svg viewBox="0 0 300 170" class="w-48 h-auto mb-1 drop-shadow-[0_0_12px_rgba(230,0,0,0.35)]">
-          <!-- Ala Roja Izquierda Superior -->
           <polygon points="75,30 165,65 145,75" fill="#e60000" />
-          <!-- Ala Roja Izquierda Inferior -->
           <polygon points="82,48 140,78 90,115 118,76" fill="#e60000" />
-          <!-- Arco Rojo Derecho -->
           <path d="M 192,70 C 220,90 210,115 140,128 C 185,112 198,92 182,78 Z" fill="#e60000" />
-          <!-- Flecha Principal Blanca -->
           <polygon points="98,108 228,38 175,118 178,82" fill="#ffffff" />
-          <!-- Texto MACANTE -->
           <text x="150" y="148" text-anchor="middle" fill="#ffffff" font-family="Orbitron, sans-serif" font-weight="900" font-style="italic" font-size="27" letter-spacing="2">MACANTE</text>
-          <!-- Texto RACING -->
           <text x="150" y="167" text-anchor="middle" fill="#e60000" font-family="Orbitron, sans-serif" font-weight="700" font-style="italic" font-size="16" letter-spacing="6">RACING</text>
         </svg>
         <span class="text-[11px] font-mono uppercase tracking-widest text-gray-400 mt-1">Telemetry & Finance Suite</span>
@@ -185,7 +179,6 @@
            SECCIÓN 1: DASHBOARD, CAJAS Y RESERVAS
            ========================================== -->
       <section id="tab-dashboard" class="tab-content space-y-6">
-        <!-- Tarjetas KPI Principales -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           <div class="bg-macante-card border border-macante-border rounded-xl p-5">
             <div class="flex justify-between items-start">
@@ -234,7 +227,7 @@
               <p class="text-xs text-gray-400 mt-0.5">Control exacto de cuánto dinero hay en cada cuenta o en efectivo físico.</p>
             </div>
             <button onclick="openBoxModal()" class="admin-only px-4 py-2 bg-macante-carbon hover:bg-gray-800 border border-macante-border rounded-lg text-xs font-semibold text-white transition flex items-center gap-2">
-              <i class="fa-solid fa-Sliders"></i> Ajustar / Transferir entre Cajas
+              <i class="fa-solid fa-sliders"></i> Ajustar Saldo de Cajas
             </button>
           </div>
 
@@ -265,7 +258,6 @@
            SECCIÓN 2: USUARIOS, CUOTAS Y APORTACIONES
            ========================================== -->
       <section id="tab-usuarios" class="tab-content hidden space-y-6">
-        <!-- Cabecera y explicación del cálculo -->
         <div class="bg-macante-card border border-macante-border rounded-xl p-6">
           <div class="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-macante-border">
             <div>
@@ -273,14 +265,13 @@
                 <i class="fa-solid fa-users text-macante-red"></i> Control de Miembros, Cuotas Mensuales y Aportaciones Voluntarias
               </h2>
               <p class="text-xs text-gray-400 mt-1 max-w-3xl">
-                Las facturas recurrentes se dividen automáticamente entre los miembros marcados con <strong>"Paga al Mes"</strong>. Las aportaciones voluntarias descuentan equitativamente la cuota de los miembros que pagan al mes.
+                Introduce únicamente el dinero aportado en euros. El sistema calcula automáticamente cuántos meses tiene cubiertos cada miembro según la cuota mensual vigente.
               </p>
             </div>
 
-            <!-- UN ÚNICO BOTÓN DE APORTACIÓN + BOTÓN PROTEGIDO DE REINICIO -->
             <div class="flex flex-wrap items-center gap-3 admin-only">
               <button onclick="openContributionModal()" class="px-5 py-2.5 bg-macante-red hover:bg-macante-redHover rounded-lg text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-red-950/50 transition flex items-center gap-2">
-                <i class="fa-solid fa-hand-holding-dollar"></i> + Registrar Aportación
+                <i class="fa-solid fa-hand-holding-dollar"></i> + Registrar Aportación (€)
               </button>
               <button onclick="openResetSecurityModal()" class="px-3.5 py-2.5 bg-macante-bg hover:bg-red-950/60 border border-red-900/60 text-red-400 rounded-lg text-xs font-semibold transition flex items-center gap-2" title="Requiere confirmación de seguridad">
                 <i class="fa-solid fa-shield-exclamation"></i> Reiniciar Aportaciones
@@ -292,26 +283,26 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-5 p-4 bg-macante-bg border border-macante-border rounded-lg">
             <div>
               <span class="text-[11px] text-gray-400 uppercase">Gasto Mensual Facturas (IVA incl.)</span>
-              <div id="math-monthly-total" class="text-lg font-mono font-bold text-white">6,00 €</div>
+              <div id="math-monthly-total" class="text-lg font-mono font-bold text-white">0,00 €</div>
             </div>
             <div>
               <span class="text-[11px] text-gray-400 uppercase">Miembros que pagan cuota</span>
-              <div id="math-paying-users" class="text-lg font-mono font-bold text-white">6 miembros</div>
+              <div id="math-paying-users" class="text-lg font-mono font-bold text-white">0 miembros</div>
             </div>
             <div>
               <span class="text-[11px] text-gray-400 uppercase">Cuota Mensual por Cabeza</span>
-              <div id="math-quota-per-head" class="text-lg font-mono font-bold text-macante-red">1,00 € / mes</div>
+              <div id="math-quota-per-head" class="text-lg font-mono font-bold text-macante-red">0,00 € / mes</div>
             </div>
             <div>
               <span class="text-[11px] text-gray-400 uppercase">Bote Voluntario (Descuento Equitativo)</span>
-              <div id="math-voluntary-bonus" class="text-lg font-mono font-bold text-emerald-400">4,00 € (-0,67 €/c.u.)</div>
+              <div id="math-voluntary-bonus" class="text-lg font-mono font-bold text-emerald-400">0,00 €</div>
             </div>
           </div>
 
           <!-- Barra rápida para añadir usuario -->
           <form onsubmit="quickAddUser(event)" class="admin-only flex flex-wrap items-center gap-3 bg-black/40 p-3.5 rounded-lg border border-macante-border mb-5">
             <span class="text-xs font-bold uppercase text-gray-300"><i class="fa-solid fa-user-plus text-macante-red mr-1"></i> Añadir Miembro:</span>
-            <input type="text" id="new-user-name" required placeholder="Nombre o alias (ej. Piloto 7)" class="bg-macante-card border border-macante-border rounded px-3 py-1.5 text-xs text-white focus:border-macante-red focus:outline-none flex-1 min-w-[180px]" />
+            <input type="text" id="new-user-name" required placeholder="Nombre o alias (ej. Cristobal)" class="bg-macante-card border border-macante-border rounded px-3 py-1.5 text-xs text-white focus:border-macante-red focus:outline-none flex-1 min-w-[180px]" />
             <input type="text" id="new-user-role" placeholder="Rol (ej. Mecánico / Piloto)" class="bg-macante-card border border-macante-border rounded px-3 py-1.5 text-xs text-white focus:border-macante-red focus:outline-none w-44" />
             <label class="flex items-center gap-2 text-xs text-gray-300 cursor-pointer select-none px-2">
               <input type="checkbox" id="new-user-pays" checked class="accent-macante-red w-4 h-4" />
@@ -423,7 +414,7 @@
               <h2 class="font-display text-base font-bold uppercase tracking-wide flex items-center gap-2">
                 <i class="fa-solid fa-handshake-simple text-macante-red"></i> Ingresos de Patrocinios y Compromisos Asociados
               </h2>
-              <p class="text-xs text-gray-400 mt-0.5">Registra qué aportación ha hecho cada patrocinador, a qué caja ha entrado y qué compromiso tenéis (pegatinas, menciones, etc.).</p>
+              <p class="text-xs text-gray-400 mt-0.5">Registra qué aportación ha hecho cada patrocinador, a qué caja ha entrado y qué compromiso tenéis.</p>
             </div>
             <button onclick="openSponsorModal()" class="admin-only px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold uppercase tracking-wider text-white transition flex items-center gap-2">
               <i class="fa-solid fa-plus"></i> + Registrar Patrocinio
@@ -470,7 +461,7 @@
               <h2 class="font-display text-base font-bold uppercase tracking-wide flex items-center gap-2">
                 <i class="fa-solid fa-clock-rotate-left text-macante-red"></i> Historial de Auditoría (Log de Actividad)
               </h2>
-              <p class="text-xs text-gray-400 mt-0.5">Registro inmutable de quién añadió, modificó o eliminó cada movimiento en la escudería.</p>
+              <p class="text-xs text-gray-400 mt-0.5">Registro de quién añadió, modificó o eliminó cada movimiento en la escudería.</p>
             </div>
           </div>
           <div id="audit-log-list" class="divide-y divide-macante-border mt-4 max-h-[500px] overflow-y-auto">
@@ -485,7 +476,7 @@
        MODALES FLOTANTES (FORMULARIOS)
        ================================================================= -->
 
-  <!-- 1. MODAL UNIFICADO: REGISTRAR APORTACIÓN (CUOTA O VOLUNTARIA) -->
+  <!-- 1. MODAL UNIFICADO: REGISTRAR APORTACIÓN (SOLO DINERO EN EUROS) -->
   <div id="modal-contribution" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="bg-macante-card border border-macante-border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-macante-border pb-3">
@@ -508,7 +499,7 @@
               <input type="radio" name="contrib-type" value="cuota" checked onchange="toggleContribMode()" class="peer hidden" />
               <div class="p-3 rounded-lg border border-macante-border bg-macante-bg peer-checked:border-macante-red peer-checked:bg-red-950/30 text-center font-bold transition">
                 <i class="fa-solid fa-calendar-check block text-base mb-1 text-macante-red"></i>
-                Saldo Cuota / Meses
+                Saldo Cuota
               </div>
             </label>
             <label class="cursor-pointer">
@@ -520,14 +511,27 @@
             </label>
           </div>
           <p id="contrib-help-text" class="text-[11px] text-gray-400 mt-1.5">
-            Se suma al saldo individual del miembro para cubrir sus meses de cuota fija.
+            Se suma al saldo individual del miembro. El sistema calculará los meses cubiertos automáticamente.
           </p>
         </div>
 
-        <div class="bg-black/40 p-3 rounded-lg border border-macante-border">
-          <label class="block text-gray-300 font-semibold mb-1">Importe a aportar en Euros (€)</label>
-          <input type="number" step="0.01" min="0.01" id="contrib-amount" required placeholder="Ej: 0.61" class="w-full bg-macante-card border border-macante-border rounded-lg p-2.5 text-white font-mono text-base" />
-          <p class="text-[11px] text-gray-400 mt-1">El sistema sumará este dinero a la caja y actualizará automáticamente los meses cubiertos del miembro en la tabla.</p>
+        <!-- ÚNICO CAMPO DE DINERO (SIN VALIDACIÓN DE MESES) -->
+        <div class="bg-black/40 p-3.5 rounded-lg border border-macante-border space-y-2">
+          <label class="block text-gray-300 font-semibold">Importe Aportado en Euros (€)</label>
+          <input
+            type="number"
+            step="any"
+            min="0.01"
+            id="contrib-amount"
+            required
+            oninput="updateMonthsPreview()"
+            placeholder="Ej: 0.61"
+            class="w-full bg-macante-card border border-macante-border rounded-lg p-2.5 text-white font-mono text-base focus:border-macante-red focus:outline-none"
+          />
+          <div class="flex items-center justify-between text-[11px] text-gray-400 pt-1">
+            <span>Cálculo automático del sistema:</span>
+            <span id="contrib-months-preview" class="font-mono font-bold text-emerald-400">Equivale a 0.00 meses</span>
+          </div>
         </div>
 
         <div>
@@ -552,7 +556,7 @@
       </div>
 
       <p class="text-xs text-gray-300 leading-relaxed">
-        Esta acción pondrá a <strong>0,00 €</strong> los saldos de cuota acumulados y las aportaciones voluntarias de todos los miembros (por ejemplo, al cerrar temporada o empezar un nuevo ciclo).
+        Esta acción pondrá a <strong>0,00 €</strong> los saldos de cuota acumulados y las aportaciones voluntarias de todos los miembros.
       </p>
 
       <form onsubmit="confirmProtectedReset(event)" class="space-y-4 text-xs">
@@ -598,7 +602,7 @@
           </div>
           <div>
             <label class="block text-gray-300 font-semibold mb-1">Precio TOTAL pagado (€)</label>
-            <input type="number" step="0.01" min="0" id="buy-stock-total-price" required placeholder="Ej: 45.50" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+            <input type="number" step="any" min="0" id="buy-stock-total-price" required placeholder="Ej: 45.50" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
           </div>
         </div>
 
@@ -650,7 +654,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label class="block text-gray-300 font-semibold mb-1">Importe (€)</label>
-            <input type="number" step="0.01" min="0.01" id="inv-amount" required placeholder="6.00" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+            <input type="number" step="any" min="0.01" id="inv-amount" required placeholder="6.00" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
           </div>
           <div>
             <label class="block text-gray-300 font-semibold mb-1">Cálculo de IVA</label>
@@ -719,7 +723,7 @@
           </div>
           <div>
             <label class="block text-gray-300 font-semibold mb-1">Último precio ref. (€)</label>
-            <input type="number" step="0.01" id="item-price" min="0" value="0" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+            <input type="number" step="any" id="item-price" min="0" value="0" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
           </div>
         </div>
         <div class="flex justify-end gap-2 pt-3 border-t border-macante-border">
@@ -744,7 +748,7 @@
         </div>
         <div>
           <label class="block text-gray-300 font-semibold mb-1">Nuevo Saldo Real Exacto (€)</label>
-          <input type="number" step="0.01" id="adj-box-balance" required class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+          <input type="number" step="any" id="adj-box-balance" required class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
         </div>
         <div class="flex justify-end gap-2 pt-3 border-t border-macante-border">
           <button type="button" onclick="closeModal('modal-boxes')" class="px-4 py-2 rounded-lg bg-macante-bg text-gray-300">Cancelar</button>
@@ -768,7 +772,7 @@
         </div>
         <div>
           <label class="block text-gray-300 font-semibold mb-1">Cantidad a Bloquear (€)</label>
-          <input type="number" step="0.01" min="1" id="res-amount" required placeholder="150.00" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+          <input type="number" step="any" min="1" id="res-amount" required placeholder="150.00" class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
         </div>
         <div class="flex justify-end gap-2 pt-3 border-t border-macante-border">
           <button type="button" onclick="closeModal('modal-reserve')" class="px-4 py-2 rounded-lg bg-macante-bg text-gray-300">Cancelar</button>
@@ -793,7 +797,7 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-gray-300 font-semibold mb-1">Importe aportado (€)</label>
-            <input type="number" step="0.01" min="1" id="sp-amount" required class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
+            <input type="number" step="any" min="1" id="sp-amount" required class="w-full bg-macante-bg border border-macante-border rounded-lg p-2.5 text-white font-mono" />
           </div>
           <div>
             <label class="block text-gray-300 font-semibold mb-1">Caja de destino</label>
@@ -830,63 +834,34 @@
       measurementId: "G-B0V8M0TGZJ"
     };
 
-    // Estado inicial con el ejemplo exacto pedido
     const defaultState = {
       boxes: [
-        { id: 'banco', name: 'Cuenta General / Banco', balance: 420.00, icon: 'fa-building-columns' },
-        { id: 'bizum', name: 'Fondo Bizum Equipo', balance: 85.00, icon: 'fa-mobile-screen-button' },
-        { id: 'efectivo', name: 'Efectivo en Box / Taller', balance: 50.00, icon: 'fa-money-bill-wave' },
-        { id: 'hucha', name: 'Hucha Emergencias', balance: 30.00, icon: 'fa-piggy-bank' }
+        { id: 'banco', name: 'Cuenta General / Banco', balance: 0.00, icon: 'fa-building-columns' },
+        { id: 'bizum', name: 'Fondo Bizum Equipo', balance: 0.00, icon: 'fa-mobile-screen-button' },
+        { id: 'efectivo', name: 'Efectivo en Box / Taller', balance: 0.00, icon: 'fa-money-bill-wave' },
+        { id: 'hucha', name: 'Hucha Emergencias', balance: 0.00, icon: 'fa-piggy-bank' }
       ],
-      reserves: [
-        { id: 'res1', name: 'Rodada Circuito de Tabernas', amount: 200.00 }
-      ],
+      reserves: [],
       users: [
-        { id: 'u1', name: 'Usuario 1 (Colaborador)', role: 'Apoyo Externo', paysMonthly: false, paidQuota: 0.00, voluntary: 4.00 },
-        { id: 'u2', name: 'Usuario 2 (Stefan)', role: 'Encargado / Piloto', paysMonthly: true, paidQuota: 4.00, voluntary: 0.00 },
-        { id: 'u3', name: 'Usuario 3', role: 'Encargado / Mecánico', paysMonthly: true, paidQuota: 2.00, voluntary: 0.00 },
-        { id: 'u4', name: 'Usuario 4', role: 'Encargado / Piloto', paysMonthly: true, paidQuota: 1.00, voluntary: 0.00 },
-        { id: 'u5', name: 'Usuario 5', role: 'Encargado / Logística', paysMonthly: true, paidQuota: 1.00, voluntary: 0.00 },
-        { id: 'u6', name: 'Usuario 6', role: 'Equipo', paysMonthly: true, paidQuota: 0.00, voluntary: 0.00 },
-        { id: 'u7', name: 'Usuario 7', role: 'Equipo', paysMonthly: true, paidQuota: 1.00, voluntary: 0.00 }
+        { id: 'u1', name: 'Stefan', role: 'Encargado / Piloto', paysMonthly: true, paidQuota: 0.00, voluntary: 0.00 }
       ],
-      invoices: [
-        {
-          id: 'inv1',
-          date: '2026-11-01',
-          concept: 'Mantenimiento Dominio y Servidor Web',
-          category: 'Dominio y Web',
-          boxId: 'banco',
-          freq: 'mensual',
-          totalAmount: 6.00,
-          monthlyImpact: 6.00,
-          ivaMode: 'IVA incl.',
-          event: 'Infraestructura Anual',
-          driveUrl: 'https://drive.google.com/'
-        }
-      ],
-      inventory: [
-        { id: 'it1', name: 'Aceite Competición 10W-60 (Garrafa 5L)', stock: 2, lastPrice: 48.00 },
-        { id: 'it2', name: 'Líquido de Frenos Racing DOT 4 (500ml)', stock: 3, lastPrice: 14.50 },
-        { id: 'it3', name: 'Spray Limpiador de Frenos Taller', stock: 5, lastPrice: 3.80 }
-      ],
-      sponsors: [
-        { id: 'sp1', name: 'MacandoFotoGR', amount: 100.00, commitment: 'Cobertura fotográfica oficial y pegatina trasera', date: '2026-10-15' }
-      ],
+      invoices: [],
+      inventory: [],
+      sponsors: [],
       logs: [
-        { id: 'l1', time: '02/11/2026 20:45', user: 'Usuario 2 (Stefan)', action: 'Configuración inicial del sistema financiero Macante Racing' }
+        { id: 'l1', time: '03/11/2026', user: 'Sistema', action: 'Sistema financiero Macante Racing conectado' }
       ]
     };
 
     let state = JSON.parse(localStorage.getItem('macante_finance_state')) || defaultState;
-    let activeOperator = state.users[1]?.name || 'Encargado';
+    let activeOperator = state.users[0]?.name || 'Encargado';
     let currentInvoiceFilter = 'TODAS';
     let db = null;
     let stateDocRef = null;
     let categoryChart = null;
     let userChart = null;
 
-    // Inicializar Firebase y escuchar en tiempo real
+    // Inicializar Firebase y escuchar en tiempo real (la nube manda siempre)
     try {
       const app = initializeApp(firebaseConfig);
       db = getFirestore(app);
@@ -896,10 +871,18 @@
         const badge = document.getElementById('cloud-status');
         if (snapshot.exists()) {
           state = snapshot.data();
+          // Asegurar que arrays vacíos no sean undefined si se borraron en Firebase
+          state.boxes = state.boxes || defaultState.boxes;
+          state.reserves = state.reserves || [];
+          state.users = state.users || [];
+          state.invoices = state.invoices || [];
+          state.inventory = state.inventory || [];
+          state.sponsors = state.sponsors || [];
+          state.logs = state.logs || [];
+
           localStorage.setItem('macante_finance_state', JSON.stringify(state));
           renderAll();
         } else {
-          // Subir el estado inicial si la base de datos recién creada está vacía
           setDoc(stateDocRef, state);
         }
         badge.className = "flex items-center gap-1.5 font-mono text-emerald-400";
@@ -939,16 +922,14 @@
       }
     }
 
-    // Cálculos matemáticos centrales de cuotas
+    // Cálculos matemáticos centrales de cuotas (100% automáticos)
     function calculateQuotaMetrics() {
       const monthlyBurn = state.invoices.reduce((acc, inv) => acc + (Number(inv.monthlyImpact) || 0), 0);
       const payingUsers = state.users.filter(u => u.paysMonthly);
       const numPaying = payingUsers.length || 1;
       const totalVoluntaryPool = state.users.reduce((acc, u) => acc + (Number(u.voluntary) || 0), 0);
 
-      // Cuota base mensual por miembro que paga
       const baseQuotaPerHead = monthlyBurn / numPaying;
-      // Descuento equitativo gracias a las aportaciones voluntarias
       const voluntaryBonusPerHead = totalVoluntaryPool / numPaying;
 
       return {
@@ -960,7 +941,6 @@
       };
     }
 
-    // Renderizado general
     function renderAll() {
       renderOperatorSelect();
       renderDashboard();
@@ -980,6 +960,13 @@
     function renderOperatorSelect() {
       const sel = document.getElementById('active-operator');
       if (!sel) return;
+      if (state.users.length === 0) {
+        sel.innerHTML = `<option value="Encargado">Encargado</option>`;
+        return;
+      }
+      if (!state.users.some(u => u.name === activeOperator)) {
+        activeOperator = state.users[0].name;
+      }
       sel.innerHTML = state.users.map(u => `<option value="${u.name}" ${u.name === activeOperator ? 'selected' : ''}>${u.name}</option>`).join('');
     }
 
@@ -996,7 +983,6 @@
       document.getElementById('kpi-monthly-burn').textContent = formatEUR(metrics.monthlyBurn) + '/mes';
       document.getElementById('kpi-quota-summary').textContent = `${formatEUR(metrics.baseQuotaPerHead)} por cabeza (${metrics.numPaying} pagadores)`;
 
-      // Alerta de números rojos
       const anyNegativeBox = state.boxes.some(b => b.balance < 0);
       const alertBanner = document.getElementById('red-alert-banner');
       if (freeMoney < 0 || anyNegativeBox) {
@@ -1007,7 +993,6 @@
         document.getElementById('kpi-free-money').className = "text-2xl font-mono font-bold text-emerald-400 mt-2";
       }
 
-      // Cajas
       document.getElementById('boxes-grid').innerHTML = state.boxes.map(b => `
         <div class="bg-macante-bg border ${b.balance < 0 ? 'border-red-600' : 'border-macante-border'} rounded-xl p-4 flex flex-col justify-between">
           <div class="flex items-center justify-between text-gray-400 text-xs">
@@ -1020,7 +1005,6 @@
         </div>
       `).join('');
 
-      // Reservas
       const resGrid = document.getElementById('reserves-grid');
       if (state.reserves.length === 0) {
         resGrid.innerHTML = `<p class="text-xs text-gray-500 col-span-3">No hay fondos bloqueados actualmente.</p>`;
@@ -1040,7 +1024,7 @@
       }
     }
 
-    // 2. Renderizar Tabla de Usuarios y Cuotas (Sin colapsos en las etiquetas)
+    // 2. Renderizar Tabla de Usuarios y Cuotas (Cálculo de meses automático)
     function renderUsersTable() {
       const m = calculateQuotaMetrics();
       document.getElementById('math-monthly-total').textContent = formatEUR(m.monthlyBurn);
@@ -1049,13 +1033,17 @@
       document.getElementById('math-voluntary-bonus').textContent = `${formatEUR(m.totalVoluntaryPool)} (+${formatEUR(m.voluntaryBonusPerHead)}/c.u.)`;
 
       const tbody = document.getElementById('users-table-body');
+      if (state.users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-xs text-gray-500">Añade el primer miembro de la escudería arriba.</td></tr>`;
+        return;
+      }
+
       tbody.innerHTML = state.users.map(u => {
         let statusBadge = '';
         if (!u.paysMonthly) {
           statusBadge = `<span class="status-pill bg-purple-950/80 border border-purple-500/50 text-purple-300">EXENTO (${formatEUR(u.voluntary)} vol.)</span>`;
         } else {
-          // Meses cubiertos directos por su cuota pagada + meses extra por el descuento voluntario
-          const effectiveCredit = Number(u.paidQuota);
+          const effectiveCredit = Number(u.paidQuota) || 0;
           const monthsCovered = m.baseQuotaPerHead > 0 ? (effectiveCredit / m.baseQuotaPerHead) : 0;
 
           if (monthsCovered >= 1) {
@@ -1145,9 +1133,13 @@
       }).join('');
     }
 
-    // 4. Renderizar Inventario (Sin precio fijo en el botón)
+    // 4. Renderizar Inventario
     function renderInventory() {
       const grid = document.getElementById('inventory-grid');
+      if (state.inventory.length === 0) {
+        grid.innerHTML = `<p class="text-xs text-gray-500 col-span-3">No hay piezas registradas en el taller.</p>`;
+        return;
+      }
       grid.innerHTML = state.inventory.map(item => `
         <div class="bg-macante-bg border border-macante-border rounded-xl p-5 flex flex-col justify-between">
           <div>
@@ -1179,6 +1171,10 @@
     // 5. Renderizar Patrocinadores
     function renderSponsors() {
       const grid = document.getElementById('sponsors-grid');
+      if (state.sponsors.length === 0) {
+        grid.innerHTML = `<p class="text-xs text-gray-500 col-span-2">No hay patrocinios registrados.</p>`;
+        return;
+      }
       grid.innerHTML = state.sponsors.map(sp => `
         <div class="bg-macante-bg border border-macante-border rounded-xl p-4 flex justify-between items-start">
           <div>
@@ -1299,12 +1295,14 @@
 
     window.closeModal = (id) => {
       const m = document.getElementById(id);
+      if (!m) return;
       m.classList.add('hidden');
       m.classList.remove('flex');
     };
 
     function showModal(id) {
       const m = document.getElementById(id);
+      if (!m) return;
       m.classList.remove('hidden');
       m.classList.add('flex');
     }
@@ -1344,12 +1342,12 @@
       saveState(`Eliminó al usuario ${u.name}`);
     };
 
-    // Modal Unificado de Aportación
+    // Modal Unificado de Aportación (Solo Euros, cálculo de meses 100% automático)
     window.openContributionModal = () => {
       const sel = document.getElementById('contrib-user');
       sel.innerHTML = state.users.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
-      document.getElementById('contrib-months').value = '';
       document.getElementById('contrib-amount').value = '';
+      updateMonthsPreview();
       showModal('modal-contribution');
     };
 
@@ -1359,22 +1357,26 @@
       if (type === 'voluntaria') {
         help.textContent = "Se añade al bote voluntario y descuenta equitativamente las facturas de los que pagan al mes.";
       } else {
-        help.textContent = "Se suma al saldo individual del miembro para cubrir sus meses de cuota fija.";
+        help.textContent = "Se suma al saldo individual del miembro. El sistema calculará los meses cubiertos automáticamente.";
       }
+      updateMonthsPreview();
     };
 
-    window.syncFromMonths = () => {
-      const months = parseFloat(document.getElementById('contrib-months').value) || 0;
-      const m = calculateQuotaMetrics();
-      const quota = m.baseQuotaPerHead > 0 ? m.baseQuotaPerHead : 1;
-      document.getElementById('contrib-amount').value = (months * quota).toFixed(2);
-    };
-
-    window.syncFromAmount = () => {
+    window.updateMonthsPreview = () => {
       const amount = parseFloat(document.getElementById('contrib-amount').value) || 0;
-      const m = calculateQuotaMetrics();
-      const quota = m.baseQuotaPerHead > 0 ? m.baseQuotaPerHead : 1;
-      document.getElementById('contrib-months').value = quota > 0 ? (amount / quota).toFixed(2) : '0';
+      const type = document.querySelector('input[name="contrib-type"]:checked')?.value || 'cuota';
+      const previewEl = document.getElementById('contrib-months-preview');
+      if (!previewEl) return;
+
+      if (type === 'voluntaria') {
+        const m = calculateQuotaMetrics();
+        const discountPerMember = amount / m.numPaying;
+        previewEl.textContent = `Descuenta ${formatEUR(discountPerMember)} a cada miembro`;
+      } else {
+        const m = calculateQuotaMetrics();
+        const months = m.baseQuotaPerHead > 0 ? (amount / m.baseQuotaPerHead) : 0;
+        previewEl.textContent = `Equivale a ${months.toFixed(2)} meses`;
+      }
     };
 
     window.submitContribution = (e) => {
@@ -1389,11 +1391,11 @@
       if (!user || !box || amount <= 0) return;
 
       if (type === 'voluntaria') {
-        user.voluntary = Number(user.voluntary) + amount;
+        user.voluntary = +(Number(user.voluntary) + amount).toFixed(2);
       } else {
-        user.paidQuota = Number(user.paidQuota) + amount;
+        user.paidQuota = +(Number(user.paidQuota) + amount).toFixed(2);
       }
-      box.balance = Number(box.balance) + amount;
+      box.balance = +(Number(box.balance) + amount).toFixed(2);
 
       closeModal('modal-contribution');
       saveState(`Registró aportación (${type}) de ${formatEUR(amount)} de ${user.name} en ${box.name}`);
@@ -1436,7 +1438,7 @@
       const driveUrl = document.getElementById('inv-drive').value.trim();
       const deductNow = document.getElementById('inv-deduct-now').checked;
 
-      const totalAmount = iva === 'add21' ? rawAmount * 1.21 : rawAmount;
+      const totalAmount = +(iva === 'add21' ? rawAmount * 1.21 : rawAmount).toFixed(2);
       const ivaLabel = iva === 'add21' ? '+21% IVA apl.' : (iva === 'included' ? 'IVA incl.' : 'Exento IVA');
 
       let monthlyImpact = 0;
@@ -1460,7 +1462,7 @@
 
       if (deductNow) {
         const box = state.boxes.find(b => b.id === boxId);
-        if (box) box.balance = Number(box.balance) - totalAmount;
+        if (box) box.balance = +(Number(box.balance) - totalAmount).toFixed(2);
       }
 
       closeModal('modal-invoice');
@@ -1527,7 +1529,7 @@
 
       item.stock += qty;
       item.lastPrice = +(totalPaid / qty).toFixed(2);
-      box.balance -= totalPaid;
+      box.balance = +(Number(box.balance) - totalPaid).toFixed(2);
 
       state.invoices.unshift({
         id: 'inv_' + Date.now(),
@@ -1555,7 +1557,7 @@
       const newBal = parseFloat(document.getElementById('adj-box-balance').value) || 0;
       const box = state.boxes.find(b => b.id === boxId);
       if (!box) return;
-      box.balance = newBal;
+      box.balance = +newBal.toFixed(2);
       closeModal('modal-boxes');
       saveState(`Ajustó el saldo de "${box.name}" a ${formatEUR(newBal)}`);
     };
@@ -1565,7 +1567,7 @@
       e.preventDefault();
       const name = document.getElementById('res-name').value.trim();
       const amount = parseFloat(document.getElementById('res-amount').value) || 0;
-      state.reserves.push({ id: 'res_' + Date.now(), name, amount });
+      state.reserves.push({ id: 'res_' + Date.now(), name, amount: +amount.toFixed(2) });
       closeModal('modal-reserve');
       e.target.reset();
       saveState(`Bloqueó reserva de ${formatEUR(amount)} para "${name}"`);
@@ -1587,12 +1589,12 @@
       const commitment = document.getElementById('sp-commitment').value.trim();
 
       const box = state.boxes.find(b => b.id === boxId);
-      if (box) box.balance += amount;
+      if (box) box.balance = +(Number(box.balance) + amount).toFixed(2);
 
       state.sponsors.unshift({
         id: 'sp_' + Date.now(),
         name,
-        amount,
+        amount: +amount.toFixed(2),
         commitment,
         date: new Date().toISOString().slice(0, 10)
       });
